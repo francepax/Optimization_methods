@@ -1,0 +1,61 @@
+% !TEX root = ../main.tex
+\section{Lesson 1 -- Convex Analysis}
+
+\begin{definition}[Convex set]
+A set $C$ is \emph{convex} if, for every $x, y \in C$ and every $\alpha \in [0,1]$,
+\[
+  \alpha x + (1-\alpha) y \in C.
+\]
+\end{definition}
+
+\begin{definition}[Affine set]
+A set $C$ is \emph{affine} if, for every $x, y \in C$ and every $\alpha \in \R$,
+\[
+  \alpha x + (1-\alpha) y \in C.
+\]
+\end{definition}
+
+\begin{remark}
+Every affine set is convex, since $[0,1] \subset \R$.
+\end{remark}
+
+Example of affine set are: any single point, any line, the solution set of a linear system
+
+
+\begin{definition}[convex combination]
+A \emph{convex combination} of the point $x^1,x^2,\dots,x^k$ is a point
+\[
+    y=\sum_{i=1}^{k} \alpha_i x^i
+    \quad \text{where} \quad 
+    \alpha_1,\dots,\alpha_k \in [0,1] 
+    \quad\text{and} \quad
+     \sum_{i=1}^{k}\alpha_i=1
+\]
+\end{definition}
+\begin{remark}
+By definition, a set $C \in R^n$ is \emph{convex} id it contains all the convex combinations of any two points in C.
+\end{remark}
+
+A convex set also contain any convex combination of its points. 
+\begin{lemma}
+    if $C$ is convex, then any $x^1,\dots,x^k \in C \text{and} \alpha_i,\dots,\alpha_k \in [0,1] \text{s.t.} \sum_{i=1}^{k}\alpha_i=1,$
+    \[
+        \sum_{i=1}^{k}\alpha_ix^i \in C
+    \]
+\end{lemma}
+
+\begin{definition}[convex hull]
+    The \emph{convex hull} $conv(C)$ of a set C is  the intersection of all teh convex sets containing C.
+    $\implies$ it is the smallest convex set containing C
+\end{definition}
+
+
+\begin{lemma}
+    $conv(C) = \{ \text{all convex combinatoins of points in C}\}$
+\end{lemma}
+
+\begin{remark}
+    Observe tha C is convex if and only $C = conv(C)$
+\end{remark}
+
+polyhedron and balls, !ToDo

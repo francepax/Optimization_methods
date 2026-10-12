@@ -1,0 +1,50 @@
+\section{Lesson 06 --- 09/10/2026}
+
+\subsection{Gradient method --- quadratic case}
+
+If $f(x) = \frac{1}{2}x^TQx + c^Tx$, with $Q$ a positive definite matrix, we can use the Taylor expansion at $x^k$:
+\[
+    f(x^k+td^k) = f(x^k) + (td^k)^T\nabla f(x^k) + \frac{1}{2}(td^k)^TQ\,td^k
+    = \frac{1}{2}(d^k)^TQd^k\,t^2 + (d^k)^Tg^k\,t + f(x^k),
+\]
+where $g^k = \nabla f(x^k) = Qx^k + c$.
+Now we want to minimize this expression with respect to $t$: we take the derivative with respect to $t$, set it equal to $0$ and solve for $t$:
+\[
+    t_k = -\frac{(d^k)^Tg^k}{(d^k)^TQd^k}.
+\]
+
+As already observed, two subsequent directions are orthogonal: $(d^k)^Td^{k+1} = 0$. This implies that the generated sequence has a zig-zag behavior, which can result in slow convergence.
+
+\begin{theorem}[Error bound]
+    If $f(x) = \frac{1}{2}x^TQx + c^Tx$, with $Q$ a positive definite matrix, and $x^*$ is the global minimum of $f$, then the sequence $\{x^k\}$ satisfies the following inequality:
+    \[
+        \norm{x^{k+1}-x^*}_Q \le \left(\frac{\frac{\lambda_n}{\lambda_1}-1}{\frac{\lambda_n}{\lambda_1}+1}\right)\norm{x^k-x^*}_Q \quad \forall k \ge 0, \qquad \text{(linear convergence)}
+    \]
+    where $\norm{x}_Q = \sqrt{x^TQx}$ and $0 < \lambda_1 \le \lambda_2 \le \dots \le \lambda_n$ are the eigenvalues of $Q$.
+\end{theorem}
+
+\begin{remark}
+    If $\lambda_n/\lambda_1$ (the \s{condition number} of $Q$) is $\gg 1$, then the ratio
+    \[
+        \frac{\frac{\lambda_n}{\lambda_1}-1}{\frac{\lambda_n}{\lambda_1}+1} \simeq 1
+    \]
+    and the convergence may be slow.
+\end{remark}
+
+The convergence rate is strictly related to the condition number of the matrix $Q$.
+
+\subsection{Inexact version of gradient methods}
+When $f$ is not a quadratic function, finding the exact minimum along the direction may be computationally expensive, so in these cases we define a stopping condition on the step.
+
+\begin{algorithm}[htbp]
+\caption{Gradient method with the Armijo inexact line search}
+Set $\alpha, \gamma \in (0,1)$ and $\bar{t} > 0$. Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    $d^k = -\nabla f(x^k)$, $t_k = \bar{t}$\;
+    \While{$f(x^k + t_k d^k) > f(x^k) + \alpha\, t_k (d^k)^T \nabla f(x^k)$}{
+        $t_k = \gamma\, t_k$\;
+    }
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
