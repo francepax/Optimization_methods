@@ -1,0 +1,68 @@
+% !TEX root = ../main.tex
+
+\section{Lesson 2 -- more about convex analysis}
+
+\subsection{Example on balls}
+we start the lesson by giving some example of balls
+exercise 1.1
+    find the unit ball $B(0,1)$ w.r.t $\|.\|_1, \| . \|_\infty \space \text{and} \space \|.\|_A where $
+    \[ A = \begin{bmatrix}
+        4 & 0 \\
+        0 & 1
+    \end{bmatrix}
+    \]
+
+$\| x \|_1= |x_1|+|x_2| \quad B(1,0) = \{ (x_1,x_2): \left\|x\right\|_1 \le 1\}\implies|x_1|+|x_2|\le1 \\$
+
+ \[
+ |x_1|+|x_2| =
+  \begin{cases}
+    x_1 + x_2  \\
+    x_1 - x_2 \\
+    x_2 -x_1 \\
+    -x_1 -x_2
+  \end{cases}
+\]
+
+These four equations need to be all less or equal then 1 so they draw a square rotated by 45 degrees intercepting $1$ or$ -1$ on the axis, that is our Ball and it is a convex set.\\
+
+ToDo $\infty$\\
+
+Now if we consider A norm.\\
+
+$\left\|x\right\|_A = \sqrt{x^tAX}\\
+x^tAx = \begin{bmatrix}x_1 & x_2\end{bmatrix}\begin{bmatrix}
+        4 & 0 \\
+        0 & 1
+    \end{bmatrix}\begin{bmatrix}x_1 \\ x_2\end{bmatrix} = 4{x_1}^2 + {x_2}^2 \le 1 \quad \text{That's an ellipse}$\\
+
+Exercise 2:\\
+Prove that $B(0,1)=\{x \in \mathbb{R}^n:\left\|x\right\|\le1\}\text{is convex for any norm}$\\
+Let $x,y \in B(0,1),$ I have to prove that$\alpha x + (1-\alpha)y \in B(0,1),\quad \forall \alpha \in[0,1]\\$
+$\implies \left\| \alpha x + (1-\alpha)y \right\| \le 1 \quad  \forall \alpha \in[0,1]\\ \quad \left\| \alpha x + (1-\alpha)y \right\| \le \left\| \alpha x\right\| + \left\|(1-\alpha)y\right\|=\alpha\left\|x\right\|+ (1-\alpha)\left\|y\right\| \le \alpha * 1 + (1-\alpha)*1 = 1$
+\\
+\\
+\subsection{Operation that preserve convexity}
+Algebraic operations:
+\begin{lemma}
+    If $C_1  \text{and}C_2$ are convex, then $C_1 + C_2\doteq \{x+y: x \in C_1, y \in C_2\} $ is convex.\\
+    If $C_1  \text{and} C_2$ are convex, then $C_1 - C_2\doteq \{x-y: x \in C_1, y \in C_2\} $ is convex.
+\end{lemma}
+Topological operations:
+\begin{lemma}
+    if $C$ is ocnvex then$ cl(C) $is convex.
+    if $C$ is ocnvex then$ int(C) $is convex, provided that\\ $int(C)\ne \emptyset $.
+\end{lemma}
+
+\subsection{Relative interior}
+Given a set $ C \subseteq R^n $ we denote by $aff(C)$ teh smallest affine set containing $C$.
+\begin{definition}[Relative interior]
+    Let $ C \subseteq R^n $ be a convex set.\\
+    The relative interior of $C$ is define by\\
+    \[
+        ri(C)=\{x \in C : \exists\,\epsilon > 0\  s.t.\ aff(C) \cap B(x,\epsilon)\subset C\subseteq  \}
+    \]
+\end{definition}
+
+
+convex cone ToDo

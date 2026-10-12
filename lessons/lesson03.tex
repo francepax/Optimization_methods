@@ -1,0 +1,181 @@
+\section{Lesson 3 --- cones and convex functions}
+
+\definition[cone]
+A set $C$ is a \emph{cone} if, for every $x \in C$ and every $\lambda \ge 0$, 
+\[
+    \lambda x \in C.
+\]
+In other words, if C contains a point x different from 0, then it
+also contains the whole half-line starting at 0 and passing through x.
+\\
+Cone may be convex or non-convex, let's see some examples of cones:
+
+\begin{example}
+    Here are some examples of cones:
+    \begin{itemize}
+        \item $\R_+^n$ is a convex cone.
+        
+        \item $\{ \bm{x} \in \R^2 : x_1 x_2 = 0\}$ is a non-convex cone.
+        
+        \item Given a polyhedron $P = \{\bm{x} \in \R^n : A\bm{x} \le \bm{b}\}$, the recession cone of $P$ is the set 
+        \[ 
+        \text{rec}(P) = \{\bm{d} \in \R^n : \bm{x}+\alpha \bm{d} \in P \text{ for any } \bm{x} \in P, \alpha \ge 0\} 
+        \]
+        This gives us the set of directions that allow us to remain in the polyhedron. It's possible to demonstrate that this is a convex set.
+        \item Given $\bar{x} \in cl(C) \subseteq  R^n$, the set
+         \[
+            T_c(\bar{x}) = \{d \in R^n : \exists\{z_k\} \subset C, \exists\{t_k\} > 0, \lim_{k \to \infty} t_k(z_k - \bar{x}) = d\} is the tangent cone of C.
+         \]   
+    \end{itemize}
+\end{example}
+
+\subsection{Convex functions}
+\begin{definition}
+A function $f$ its convex , for every two points $x,y \in dom(f)$ and every $\alpha \in [0,1]$,
+\[
+    f(\alpha y + (1-\alpha)x) \le \alpha f(y) + (1-\alpha)f(x)  
+\]
+\end{definition}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=1.2]
+        % Asse x (orizzontale)
+        \draw (-3, 0) -- (4, 0);
+
+        % Funzione convessa (disegno una parabola f(x) = 0.3*x^2 + 1)
+        \draw[thick, domain=-2.5:3.5, samples=100] plot (\x, {0.3*\x*\x + 1});
+
+        % Definisco le coordinate x dei punti per comodità
+        \def\xa{-1.5}
+        \def\xb{3}
+        \def\xc{0.8} % combinazione convessa (il punto in mezzo)
+
+        % Calcolo le coordinate Y dei punti sulla curva
+        \coordinate (A) at (\xa, {0.3*\xa*\xa + 1});
+        \coordinate (B) at (\xb, {0.3*\xb*\xb + 1});
+        \coordinate (C_curve) at (\xc, {0.3*\xc*\xc + 1});
+
+        % Calcolo la coordinata Y del punto sulla corda (linea tratteggiata)
+        % Uso la formula dell'interpolazione lineare tra A e B
+        \coordinate (C_line) at (\xc, { (0.3*\xa*\xa + 1) + ((0.3*\xb*\xb + 1) - (0.3*\xa*\xa + 1))/(\xb - \xa) * (\xc - \xa) });
+
+        % Disegno la corda (linea tratteggiata)
+        \draw[thick, dashed] (A) -- (B);
+
+        % Disegno le linee verticali puntinate
+        \draw[dotted] (\xa, 0) -- (A);
+        \draw[dotted] (\xb, 0) -- (B);
+        \draw[dotted] (\xc, 0) -- (C_line);
+
+        % Disegno i punti sull'asse x e metto le etichette
+        \filldraw (\xa, 0) circle (1.5pt) node[below=5pt] {$x$};
+        \filldraw (\xb, 0) circle (1.5pt) node[below=5pt] {$y$};
+        \filldraw (\xc, 0) circle (1.5pt) node[below=5pt] {$\alpha y + (1-\alpha)x$};
+
+        % Disegno i punti sulla curva e sulla retta e metto le etichette
+        \filldraw (A) circle (1.5pt) node[left=5pt] {$f(x)$};
+        \filldraw (B) circle (1.5pt) node[right=5pt] {$f(y)$};
+        \filldraw (C_curve) circle (1.5pt) node[below right=2pt] {$f(\alpha y + (1-\alpha)x)$};
+        \filldraw (C_line) circle (1.5pt) node[above left=2pt] {$\alpha f(y) + (1-\alpha)f(x)$};
+
+    \end{tikzpicture}
+    \caption{Example of a convex function.}
+    \label{fig:convex_def}
+\end{figure}
+
+\theorem{
+    A function $f:\R^n \to \R$ is convex if and only if the set, 
+    \[
+        \{(x,y) \in \R^{n} \times \R : y \ge f(x)\}
+    \]
+    called the \emph{epigraph} of $f$, is convex.
+}
+
+\definition[concave function]{
+    Given a convex set $C \subseteq \R^n$, a function $f:R^n \to \R$ is concave on C if $-f$ is convex on C.
+}
+
+There are some functions that are both convex and concave, like a linear (affine) function $f(x) = C^tx + b$.
+
+\theorem{
+    Let $f:\R^n \to \R$ be convex on the convex set $C \subseteq \R^n$. then $f$ is continuous on the interior of C.
+}
+
+\definition[strictly convex function]{
+    Givena a convex set $C \subseteq \R^n$, a function $f:\R^n \to \R$ is strictly convex on C if, 
+    \[
+        f(\alpha y + (1-\alpha)x) < \alpha f(y) + (1-\alpha)f(x)
+    \]
+    for all $x,y \in C$, $x \ne y$, and $\alpha \in (0,1)$.
+}
+The difference between convex and strictly convex functions is that the inequality is strict for strictly convex functions, that means that a stictly convex function cannot
+be concave.
+
+\definition[strongly convex function]{
+    Given a convex set $C \subseteq \R^n$, a function $f:\R^n \to \R$ is strongly convex on C if there exists a constant $\tau > 0$ such that,
+        \[
+            f(\alpha y + (1-\alpha)x) \le \alpha f(y) + (1-\alpha)f(x) - \frac{\tau}{2}\alpha(1-\alpha)\|y-x\|_2^2
+        \]
+}
+
+\remark{
+    Similarly to convex functions, we can define strictly or strongly concave functions $f$ if $-f$ is strictly or strongly convex.
+}
+
+\theorem{
+   $f$ is strongly convex if and only if $\exists \tau > 0$ such that $f(x) - \frac{\tau}{2}\|x\|_2^2$ is convex. 
+}
+\remark{
+    Thanks to this theorem we can say that $f$ is strongly convex if and only if there exists a 
+    convex function $g$ and a constant $\tau > 0$ such that $f(x) = g(x) + \frac{\tau}{2}\|x\|_2^2$.
+}
+
+
+If we consider a function $f:\R^n \to \R$  that is differentiable on an open convex set $C \subseteq \R^n$ we can use this theorem.
+
+\theorem{
+    $f$ is convex on $C$ if and only if:
+    \[
+        f(y) \ge f(x) + (y-x)^T \nabla f(x) \quad \forall x,y \in C
+    \]
+}
+
+if we consider a function $g(y)= f(\bar{x})+ (y-\bar{x})^T \nabla f(\bar{x})$ we can see that this function is the tangent plane to the function $f$ in the point $\bar{x}$, so this theorem says that a function is convex if and only if it is always above its tangent line.
+\\
+We can also use the same theroem to ddefine strictly and strongly convex functions, we just need to change the inequality sign in the definition of convexity, for strictly convex functions, 
+and add the term $\frac{\tau}{2}\|y-x\|_2^2$ for strongly convex functions.
+
+\theorem{
+t\\   
+\begin{itemize}
+        
+    \item $f$ is strictly convex on $C$ if and only if:
+        \[
+            f(y) > f(x) + (y-x)^T \nabla f(x) \quad \forall x,y \in C, x \ne y
+        \]
+    \item $f$ is strongly convex on $C$ if and only if:
+        \[
+            f(y) \ge f(x) + (y-x)^T \nabla f(x) + \frac{\tau}{2}\|y-x\|_2^2 \quad \forall x,y \in C
+        \]
+\end{itemize}
+}
+
+
+If we can evaluate the second order derivative of a function $f:\R^n \to \R$ we can use the following theorem.
+\theorem{
+    Let $f:\R^n \to \R$ be a twice differentiable function on an open convex set $C \subseteq \R^n$. Then:
+    \begin{itemize}
+        \item $f$ is convex on $C$ if and only if for all $x \in C$ the Hessian matrix $\nabla^2 f(x)$ is positive semidefinite
+            \[
+                v^T \nabla^2 f(x) v \ge 0 \quad \forall v \in \R^n, \forall x \in C,
+            \]
+            or, equivalently, the eigenvalues of $\nabla^2 f(x)$ are non-negative for all $x \in C$.
+        \item if $\nabla^2 f(x)$ is positive definite for all $x \in C$, then $f$ is strictly convex on $C$.
+        \item $f$ is strongly convex on $C$ if and only if there exists a constant $\tau > 0$ such that $\nabla^2 f(x) - \tau I_n$ is positive semidefinite for all $x \in C$.
+        \[
+            v^T \nabla^2 f(x) v \ge \tau\|v\|_2^2 \quad \forall v \in \R^n, \forall x \in C,
+        \]
+        or, equivalently, the eigenvalues of $\nabla^2 f(x)$ are greater than or equal to $\tau$ for all $x \in C$.
+    \end{itemize}
+}

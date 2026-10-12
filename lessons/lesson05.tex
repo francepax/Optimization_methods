@@ -1,0 +1,128 @@
+\section{Lesson 05 --- 08/10/2026}
+
+\begin{theorem}
+    Assume that $f$ is convex on the convex set $X$. Then \g{any local optimum of (P) is a global optimum}.
+\end{theorem}
+\begin{proof}
+Let $x^*$ be a local optimum of (P), i.e., there is $r>0$ s.t.
+\[
+    f(x^*)\le f(z) \quad \forall z \in X \cap B(x^*,r).
+\]
+Continue on slide.
+\end{proof}
+
+\begin{proposition}
+    Assume that $f$ is \g{strictly convex} on the convex set $X$ and that (P) admits a global optimum $x^*$. Then $x^*$ is the \g{unique} optimal solution of (P).
+\end{proposition}
+
+\begin{theorem}
+    If $f: \R^n \to \R$ is strongly convex on $\R^n$ and $X$ is closed, then there exists a global optimum.
+\end{theorem}
+
+\begin{corollary}
+    If $f$ is strongly convex (on $\R^n$) and $X$ is closed and convex, then there exists a unique global optimum.
+\end{corollary}
+
+\begin{example}
+    Any quadratic programming problem
+    \[
+        \min \frac{1}{2}x^TQx+c^Tx, \quad x\in X,
+    \]
+    where $Q$ is a \g{positive definite} matrix and $X$ is closed and convex, has a unique global optimum.
+\end{example}
+
+If $Q$ is positive definite, all its eigenvalues are bounded below by a strictly positive constant $\implies$ $f$ is strongly convex.
+
+\subsection{Optimality conditions}
+We now focus on optimality conditions for unconstrained problems.
+
+\begin{theorem}[Necessary optimality condition]
+    Assume that $X$ is an open set and let $f$ be differentiable at $x^* \in X$. If $x^*$ is a local optimum of (P), then
+    \[
+        \nabla f(x^*)=0.
+    \]
+\end{theorem}
+
+From now on, assume that $f$ has continuous first and second order partial derivatives for every $x \in X$.
+
+\begin{theorem}[Second order necessary optimality condition]
+    Let $X$ be an open set and let $x^* \in X$ be a local optimum for (P). Then the following conditions hold:
+    \begin{itemize}
+        \item $\nabla f(x^*)=0$;
+        \item the Hessian matrix $\nabla^2 f(x^*)$ is positive semidefinite.
+    \end{itemize}
+\end{theorem}
+
+\begin{theorem}[Second order sufficient optimality condition]
+    Let $X$ be an open set, $x^* \in X$, and assume that the following conditions hold:
+    \begin{itemize}
+        \item $\nabla f(x^*)=0$;
+        \item the Hessian matrix $\nabla^2 f(x^*)$ is positive definite.
+    \end{itemize}
+    Then $x^*$ is a local optimum for (P).
+\end{theorem}
+
+\begin{theorem}[Optimality condition for convex problems]
+    Let $f$ be a differentiable convex function on the open convex set $X$. Then $x^* \in X$ is a global optimum for (P) if and only if $\nabla f(x^*)=0$.
+\end{theorem}
+\begin{proof}
+The necessity follows from the necessary optimality condition. It's important to prove the converse implication. If $\nabla f(x^*)=0$, we can prove it by applying the first order condition for convex functions with $y=x^*$:
+\[
+    f(x) - f(x^*) \ge (x-x^*)^T \nabla f(x^*) = 0 \quad \forall x \in X.
+\]
+\end{proof}
+
+\begin{theorem}
+    Let $f$ be a differentiable strictly convex function on the open convex set $X$. Then $x^* \in X$ is the unique global optimum for (P) if and only if $\nabla f(x^*)=0$.
+\end{theorem}
+
+\subsubsection{Existence of global optima for unconstrained quadratic programming problems}
+
+Consider the problem
+\[
+    \min f(x) \coloneqq \frac{1}{2}x^TQx+c^Tx, \quad x\in \R^n, \tag{P}
+\]
+where $Q$ is an $n \times n$ symmetric matrix.
+
+\begin{corollary}
+    There exists a global optimum $x^*$ for (P) if and only if the following conditions hold:
+    \begin{enumerate}[label=(\roman*)]
+        \item $Qx^*+c=0$;
+        \item $Q$ is positive semidefinite.
+    \end{enumerate}
+\end{corollary}
+
+Condition (i) is the same as $\nabla f(x^*) = 0$ (first order condition).
+Condition (ii) is the second order condition ($Q$ is the Hessian of $f$).
+
+\begin{remark}
+    We already observed that if $Q$ is positive definite, then (P) admits a unique global optimum. Its expression is $x^* = -Q^{-1}c$, derived from condition (i).
+\end{remark}
+
+If $Q$ is positive semidefinite but not positive definite, in order to guarantee the existence of a global optimum we need to analyze the existence of solutions of the system $Qx+c=0$ using the Rouch\'e--Capelli theorem.
+
+\subsection{Unconstrained optimization methods}
+
+We will see some methods for optimization problems. What is an optimization methods? In an optimization descent methods we want to find a sequence of point $x^0,x^1, \dots, x^k, \dots$ such that $f(x^0)>f(x^1)>\dots f(x^k)>\dots$ and we would like that $\lim_{k \to \infty}x^k = x^*$ where $x^*$ is such that $\nabla f(x^*)=0$ so it's a stationary points.
+
+A descent methods is characterize by the fact that $x^{k+1} = x^k + td^k$ where $d^k$ is a descent direction for $f$ at $x^k$ and $t>0$ is the \g{step}.
+
+\begin{definition}[descent direction]
+    $d \in \R^n$ is a descent direction for $f$ at $x^k$ if we have that $d^T \nabla f(x^k) < 0$.
+\end{definition}
+This means that the directional derivative along the direction $d$ is strictly negative. For a suitable t sufficiently small we have that f of $f(x^{k+1}) < f(x^k)$.
+
+How to find a descent direction? We need to solve min $d^t \nabla f(x^k) $ where the $\norm{d}=1$. In other words we want to find the steepest direction of descent. Recall that $d^t \nabla f(x^k) = \norm{d}\norm{f(x^k)}\cos(\theta)$ where $\theta$ is the angle between the gradient and the descent direction. To minimize that we need to minimize the cosine of $\theta$ (-1). So the solution to the min problem is $d^k=- \frac{\nabla f(x^k)}{\norm{\nabla f(x^k)}}$. This is also known as the \g{Gradient method}.
+
+\subsubsection{Gradient method}
+
+\begin{algorithm}[htbp]
+\caption{Gradient method}
+Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    $d^k = -\nabla f(x^k)$ \tcp*{search direction}
+    compute an optimal solution $t_k$ of $\min_{t>0} f(x^k + t d^k)$ \tcp*{step size}
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
