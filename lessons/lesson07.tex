@@ -1,0 +1,183 @@
+\section{Lesson 07 --- 15/10/2026}
+
+\subsection{Conjugate gradient method}
+The \g{conjugate gradient method} (CG) is a descent method where the search direction involves the gradient computed at the current iteration and the direction computed at the previous iteration.
+
+We first consider the quadratic case:
+\[
+    f(x) = \frac{1}{2}x^TQx + c^Tx,
+\]
+where $Q$ is positive definite. Set $g^k = \nabla f(x^k) = Qx^k + c$.
+
+At iteration $k$, the search direction is defined by
+\[
+    d^k =
+    \begin{cases}
+        -g^0 & \text{if } k = 0,\\
+        -g^k + \beta_k d^{k-1} & \text{if } k \ge 1,
+    \end{cases}
+\]
+where $\beta_k$ is such that $d^k$ and $d^{k-1}$ are \g{conjugate} with respect to $Q$, i.e.,
+\[
+    (d^k)^TQd^{k-1} = 0.
+\]
+
+From the previous condition we can compute $\beta_k$:
+\[
+    \beta_k = \frac{(g^k)^TQd^{k-1}}{(d^{k-1})^TQd^{k-1}}.
+\]
+If we perform an exact line search, then $d^k$ is a descent direction. The step size given by the exact line search is
+\[
+    t_k = -\frac{(g^k)^Td^k}{(d^k)^TQd^k}.
+\]
+
+\begin{algorithm}[H]
+\caption{Conjugate gradient method for quadratic functions}
+Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$g^k = \nabla f(x^k) \neq 0$}{
+    \eIf{$k = 0$}{
+        $d^k = -g^k$\;
+    }{
+        $\beta_k = \dfrac{(g^k)^TQd^{k-1}}{(d^{k-1})^TQd^{k-1}}$, $d^k = -g^k + \beta_k d^{k-1}$\;
+    }
+    $t_k = -\dfrac{(g^k)^Td^k}{(d^k)^TQd^k}$\;
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{example}
+    Consider $f(x) = x_1^2 + 10x_2^2$, with starting point $x^0 = (10, 1)$.
+    \[
+        Q = \begin{pmatrix} 2 & 0\\ 0 & 20 \end{pmatrix}, \qquad \nabla f(x) = (2x_1, 20x_2).
+    \]
+    \begin{itemize}
+        \item $k = 0$: $g^0 = (20, 20)$, $d^0 = -g^0 = (-20, -20)$, $t_0 = -((g^0)^Td^0)/((d^0)^TQd^0) = 1/11$, and consequently
+        \[
+            x^1 = x^0 + t_0d^0 = (10 - 20/11, 1 - 20/11) = (90/11, -9/11).
+        \]
+        \item $k = 1$: $g^1 = (180/11, -180/11)$, $\beta_1 = ((g^1)^TQd^0)/((d^0)^TQd^0) = 81/121$, $d^1 = -g^1 + \beta_1d^0 = (-3600/121, 360/121)$, $t_1 = -((g^1)^Td^1)/((d^1)^TQd^1) = 11/40$, and $x^2 = x^1 + t_1d^1 = (0, 0)$, which is the global minimum of $f$.
+    \end{itemize}
+\end{example}
+
+A peculiarity of this method is that for a quadratic function with positive definite Hessian it converges in at most $n$ iterations in $\R^n$ (in the example, $n = 2$), as stated by the following theorem.
+
+\begin{theorem}[Convergence]
+    The CG method finds the global minimum in at most $n$ iterations.
+    If $Q$ has $r$ distinct eigenvalues, then the CG method finds the global minimum in at most $r$ iterations.
+\end{theorem}
+
+If we did not find the global minimum after $k$ iterations, then the gradients $\{g^0, \dots, g^k\}$ are pairwise orthogonal, the directions $\{d^0, d^1, \dots, d^k\}$ are conjugate w.r.t.\ $Q$, and $x^k$ is the minimum of $f$ on $x^0 + \operatorname{Span}(d^0, d^1, \dots, d^{k-1})$.
+
+\begin{theorem}[Error bound]
+    If $0 < \lambda_1 \le \lambda_2 \le \dots \le \lambda_n$ are the eigenvalues of $Q$, then the following bounds hold:
+    \[
+        \norm{x^k - x^*}_Q \le 2\left(\frac{\sqrt{\lambda_n/\lambda_1} - 1}{\sqrt{\lambda_n/\lambda_1} + 1}\right)^k \norm{x^0 - x^*}_Q, \qquad \forall\, k \ge 0,
+    \]
+    \[
+        \norm{x^k - x^*}_Q \le \left(\frac{\lambda_{n-k+1} - \lambda_1}{\lambda_{n-k+1} + \lambda_1}\right) \norm{x^0 - x^*}_Q, \qquad \forall\, k \ge 0.
+    \]
+\end{theorem}
+
+At iteration $n$, notice that the error goes to $0$, since $k = n$ and $\lambda_{n-k+1} - \lambda_1 = 0$.
+
+\subsection{Newton method}
+
+\subsubsection{Basic version}
+
+We want to find a stationary point of a function $f$, i.e., a point where $\nabla f = 0$. To study the gradient, at each iteration $k$ we consider its linear expansion at $x^k$:
+\[
+    \nabla f(x) \simeq \nabla f(x^k) + \nabla^2 f(x^k)(x - x^k).
+\]
+So, to find $x^{k+1}$, instead of solving $\nabla f(x) = 0$ we solve the linear system
+\[
+    \nabla f(x^k) + \nabla^2 f(x^k)(x - x^k) = 0.
+\]
+
+Note that $x^{k+1}$ is a stationary point of the quadratic approximation of $f$ at $x^k$:
+\[
+    f(x) \simeq f(x^k) + (x - x^k)^T\nabla f(x^k) + \frac{1}{2}(x - x^k)^T\nabla^2 f(x^k)(x - x^k).
+\]
+
+\begin{algorithm}[htbp]
+\caption{Newton method (basic version)}
+Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    Let $d^k$ be the solution of the linear system $\nabla^2 f(x^k)\, d = -\nabla f(x^k)$\;
+    $x^{k+1} = x^k + d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{theorem}[Convergence]
+    If $x^*$ is a local minimum of $f$ and $\nabla^2 f(x^*)$ is positive definite, then there exists $\delta > 0$ such that for any $x^0 \in B(x^*, \delta)$ the sequence $\{x^k\}$ converges to $x^*$ and
+    \[
+        \norm{x^{k+1} - x^*} \le C\norm{x^k - x^*}^2 \qquad \forall\, k > \bar{k},
+    \]
+    for some $C > 0$ and $\bar{k} > 0$ (\g{quadratic convergence}).
+\end{theorem}
+
+\begin{example}
+    The function $f(x) = 2x_1^4 + 3x_2^4 + 2x_1^2 + 4x_2^2 + x_1x_2 - 3x_1 - 2x_2$ is strongly convex because
+    \[
+        \nabla^2 f(x) = \begin{pmatrix} 24x_1^2 + 4 & 1\\ 1 & 36x_2^2 + 8 \end{pmatrix}.
+    \]
+    Starting from $x^0 = (10, 5)$, the basic Newton method gives:
+    \begin{center}
+    \begin{tabular}{rrrr}
+        \toprule
+        $k$ & $x_1^k$ & $x_2^k$ & $\norm{\nabla f(x^k)}$\\
+        \midrule
+        0 & 10.000000 & 5.000000 & 8189.6317378\\
+        1 & 6.655450 & 3.298838 & 2429.6437291\\
+        2 & 4.421132 & 2.149158 & 721.6330686\\
+        3 & 2.925965 & 1.361690 & 214.6381594\\
+        4 & 1.923841 & 0.811659 & 63.7752575\\
+        5 & 1.255001 & 0.428109 & 18.6170045\\
+        6 & 0.823359 & 0.209601 & 5.0058040\\
+        7 & 0.580141 & 0.171251 & 1.0538969\\
+        8 & 0.492175 & 0.179815 & 0.1022945\\
+        9 & 0.481639 & 0.180914 & 0.0013018\\
+        10 & 0.481502 & 0.180928 & 0.0000002\\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+\end{example}
+
+Drawbacks of the Newton method:
+\begin{itemize}
+    \item at each iteration we need to compute both the gradient $\nabla f(x^k)$ and the Hessian matrix $\nabla^2 f(x^k)$;
+    \item \g{local convergence}: if $x^0$ is too far from the optimum $x^*$, then the generated sequence may not converge to $x^*$.
+\end{itemize}
+
+\begin{example}
+    Let $f(x) = -\frac{1}{16}x^4 + \frac{5}{8}x^2$. Then
+    \[
+        f'(x) = -\frac{1}{4}x^3 + \frac{5}{4}x, \qquad f''(x) = -\frac{3}{4}x^2 + \frac{5}{4}.
+    \]
+    $x^* = 0$ is a local minimum of $f$ with $f''(x^*) = 5/4 > 0$. The sequence does not converge to $x^*$ if it starts from $x^0 = 1$: $x^1 = -1$, $x^2 = 1$, $x^3 = -1$, \dots
+\end{example}
+
+\subsection{Newton method with line search}
+If $f$ is strongly convex, then we have global convergence because $d^k$ is a descent direction, in fact:
+\[
+    \nabla f(x^k)^T d^k = -\nabla f(x^k)^T\left[\nabla^2 f(x^k)\right]^{-1}\nabla f(x^k) < 0.
+\]
+
+\begin{algorithm}[htbp]
+\caption{Newton method with (inexact) line search}
+Set $\alpha, \gamma \in (0,1)$ and $\bar{t} > 0$. Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    Let $d^k$ be the solution of the linear system $\nabla^2 f(x^k)\, d = -\nabla f(x^k)$\;
+    $t_k = \bar{t}$\;
+    \While{$f(x^k + t_k d^k) > f(x^k) + \alpha\, t_k (d^k)^T \nabla f(x^k)$}{
+        $t_k = \gamma\, t_k$\;
+    }
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{theorem}[Convergence]
+    If $f$ is strongly convex, then for any starting point $x^0 \in \R^n$ the sequence $\{x^k\}$ converges to the global minimum of $f$. Moreover, if $\alpha \in (0, 1/2)$ and $\bar{t} = 1$, then the convergence is quadratic.
+\end{theorem}
