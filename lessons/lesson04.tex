@@ -1,0 +1,183 @@
+% !TEX root = ../main.tex
+\section{Lesson 04 --- 02/10/2026}
+
+\subsection{Optimization problem in standard form}
+
+\begin{definition}[Optimization problem]
+An optimization problem in \g{standard form} is
+\[
+    f^* = \min \{ f(x) : x \in X \}, \tag{P}
+\]
+where
+\begin{itemize}
+    \item $f: \R^n \to \R$ is the \g{objective function};
+    \item $X \subseteq \R^n$ is the \g{constraints set} or \g{feasible region}.
+\end{itemize}
+If $X \equiv \R^n$, then (P) is said to be \g{unconstrained}.
+\end{definition}
+
+From now on, we will only consider minimization problems, since
+\[
+    \max\{f(x) : x \in X\} = -\min\{-f(x) : x \in X\}.
+\]
+
+\subsubsection{Mathematical programming problems}
+
+In general $X$ is defined by the expression
+\[
+    X \coloneqq \{x \in \R^n : g_i(x) \le 0,\ i \in I,\ h_j(x) = 0,\ j \in J\},
+\]
+where $g_i: \R^n \to \R$, $i \in I \coloneqq \{1, \dots, m\}$, and $h_j: \R^n \to \R$, $j \in J \coloneqq \{1, \dots, p\}$.
+
+Using the notation
+\[
+    g(x) \coloneqq (g_1(x), \dots, g_m(x))^T, \qquad h(x) \coloneqq (h_1(x), \dots, h_p(x))^T,
+\]
+we can write $X = \{x \in \R^n : g(x) \le 0,\ h(x) = 0\}$, with $g: \R^n \to \R^m$ and $h: \R^n \to \R^p$.
+The functions $g$ and $h$ are called the \g{constraint functions}.
+
+\begin{remark}
+In this case (P) is also referred to as a \g{mathematical programming problem}.
+\end{remark}
+
+\subsection{Global and local optima}
+
+\begin{definition}[Optimal value]
+The \g{optimal value} of (P) is defined by
+\[
+    v(P) = \inf\{f(x) : x \in X\}.
+\]
+\begin{itemize}
+    \item $v(P) \in \R$ if the problem is bounded from below;
+    \item $v(P) = -\infty$ if the problem is unbounded from below;
+    \item $v(P) = +\infty$ if the problem is infeasible, i.e., $X = \emptyset$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Global optimal solution]
+A \g{global optimal solution} of (P) is a point $x^* \in X$ such that
+\[
+    f(x^*) \le f(x) \quad \forall x \in X.
+\]
+The set of global minima of $f$ on $X$ is denoted by $X^* = \argmin\{f(x) : x \in X\}$.
+\end{definition}
+
+\begin{definition}[Local optimal solution]
+A \g{local optimal solution} of (P) is a point $x^* \in X$ such that
+\[
+    f(x^*) \le f(x) \quad \forall x \in X \cap B(x^*, r)
+\]
+for some $r > 0$.
+\end{definition}
+
+\begin{example}
+\leavevmode
+\begin{itemize}
+    \item $f(x) = x$, $X = \R$: $v(P) = -\infty$, no optimal solution.
+    \item $f(x) = e^x$, $X = \R$: $v(P) = 0$, no optimal solution.
+    \item $f(x) = x^3 - 3x$, $X = \R$: $v(P) = -\infty$, $x^* = 1$ is a local optimum, no global optimum.
+    \item $f(x) = x \log(x)$, $X = \R_{++}$: $v(P) = -1/e$, $x^* = 1/e$ is a global optimum.
+    \item $f(x) = 3x^4 - 8x^3 - 6x^2 + 24x + 19$, $X = \R$: $v(P) = 0$, $x^* = -1$ is a global optimum and $\tilde{x} = 2$ is a local optimum.
+\end{itemize}
+\end{example}
+
+\subsection{Existence of global optima}
+
+\begin{theorem}[Weierstrass]
+If the objective function $f$ is continuous and the feasible region $X$ is closed and bounded, then (at least) a global optimum exists.
+\end{theorem}
+\begin{proof}
+Let $v(P) = \inf_{x \in X} f(x)$. Define a minimizing sequence $\{x^k\} \subseteq X$ such that $f(x^k) \to v(P)$.
+Since $\{x^k\}$ is bounded, the Bolzano--Weierstrass theorem guarantees that there exists a subsequence $\{x^{k_p}\}$ converging to some point $x^*$.
+Since $X$ is closed, we get $x^* \in X$.
+Finally, $f(x^{k_p}) \to f(x^*)$ since $f$ is continuous.
+Therefore $f(x^*) = v(P)$, i.e., $x^*$ is a global optimum.
+\end{proof}
+
+\begin{example}
+The problem
+\[
+    \min\ x_1 + x_2, \quad x \in X \coloneqq \{(x_1, x_2) : x_1^2 + x_2^2 - 4 \le 0\}
+\]
+admits a global optimum, since $f$ is continuous and $X$ is closed and bounded.
+\end{example}
+
+\begin{corollary}
+If the objective function $f$ is continuous, the feasible region $X$ is closed and there exists $k \in \R$ such that the $k$-sublevel set
+\[
+    S_k(f) = \{x \in X : f(x) \le k\} \tag{1}
+\]
+is nonempty and bounded, then (at least) a global optimum exists.
+\end{corollary}
+\begin{proof}
+Minimizing $f$ on $X$ is equivalent to minimizing $f$ on $S_k(f)$, which is bounded and closed since $f$ is continuous and $X$ is closed. Then apply the Weierstrass theorem.
+\end{proof}
+
+\begin{example}
+The function $f(x_1, x_2) = x_1^2 + x_2^2 - 4x_1 - 2x_2$ fulfils condition (1).
+In fact, suitably choosing $k$, the set
+\[
+    x_1^2 + x_2^2 - 4x_1 - 2x_2 \le k
+\]
+is a circle with center $C = (2, 1)$ and radius $r = \sqrt{2^2 + 1^2 + k}$.
+\end{example}
+
+\begin{example}
+Consider
+\[
+    \min\ e^{x_1 + x_2}, \quad x \in X \coloneqq \{x_1 - x_2 \le 0,\ -2x_1 + x_2 \le 0\}.
+\]
+$f$ is continuous, $X$ is closed and unbounded. But the sublevel set $S_2(f) = \{x \in X : f(x) \le 2\}$ is nonempty and bounded, thus a global optimum exists.
+Note that $S_2(f)$ is the solution set of the system
+\[
+    \begin{cases}
+        x_1 + x_2 \le \log 2 \\
+        x_1 - x_2 \le 0 \\
+        -2x_1 + x_2 \le 0
+    \end{cases}
+\]
+\end{example}
+
+\begin{corollary}
+If the objective function $f$ is continuous and \g{coercive}, i.e.,
+\[
+    \lim_{\substack{\norm{x} \to \infty \\ x \in X}} f(x) = +\infty, \tag{2}
+\]
+and the feasible region $X \ne \emptyset$ is closed, then (at least) a global optimum exists.
+\end{corollary}
+\begin{proof}
+Let $\bar{x} \in X$ and $k \coloneqq f(\bar{x})$. By (2) the sublevel set $S_k(f)$ is nonempty and bounded, then apply the previous corollary to show that a global optimum exists.
+\end{proof}
+
+\begin{example}
+Consider
+\[
+    \min_{x \in \R}\ x^4 + 3x^3 - 5x^2 + x - 2.
+\]
+Since $f$ is coercive, there exists a global optimum.
+\end{example}
+
+\begin{example}
+The function $f(x_1, x_2) = x_1^2 + x_2^2 - 4x_1 - 2x_2$ fulfils condition (2), with $X = \R^2$.
+Indeed,
+\[
+    f(x_1, x_2) = x_1^2 + x_2^2 - 4x_1 - 2x_2 = (x_1 - 2)^2 - 4 + (x_2 - 1)^2 - 1.
+\]
+If $\norm{x} = \norm{(x_1, x_2)} \to +\infty$, then at least one of the following conditions holds:
+\[
+    |x_1| \to +\infty \quad \text{or} \quad |x_2| \to +\infty.
+\]
+In the first case we have
+\[
+    \lim_{\norm{x} \to +\infty} f(x_1, x_2) \ge \lim_{|x_1| \to +\infty} (x_1 - 2)^2 - 5 = +\infty.
+\]
+In the second case
+\[
+    \lim_{\norm{x} \to +\infty} f(x_1, x_2) \ge \lim_{|x_2| \to +\infty} (x_2 - 1)^2 - 5 = +\infty.
+\]
+Therefore, for any sequence $\{x^n\} = \{(x_1^n, x_2^n)\}$ such that $\norm{x^n} \to +\infty$, we get
+\[
+    \lim_{n \to +\infty} f(x^n) = +\infty,
+\]
+which guarantees that (2) is fulfilled.
+\end{example}
