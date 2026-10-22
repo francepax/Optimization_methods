@@ -1,0 +1,275 @@
+\section{Lesson 09 --- 22/10/2026}
+
+\subsection{Lagrangian duality}
+
+\subsubsection{Lagrangian relaxation and dual function}
+
+The Lagrangian function is also the starting point of duality theory. The idea is to remove the constraints and move them into the objective function, weighted by the multipliers. Denote by $v(P)$ the optimal value of (P).
+
+\begin{definition}[Lagrangian relaxation]
+    Given $\lambda \ge 0$ and $\mu \in \R^p$, the problem
+    \[
+        \inf L(x, \lambda, \mu), \quad x \in \R^n
+    \]
+    is called \g{Lagrangian relaxation} of (P), and
+    \[
+        \varphi(\lambda, \mu) = \inf_{x \in \R^n} L(x, \lambda, \mu)
+    \]
+    is the \g{Lagrangian dual function}.
+\end{definition}
+
+The Lagrangian relaxation provides a lower bound to $v(P)$.
+
+\begin{theorem}
+    \label{thm:lower-bound}
+    For any $\lambda \ge 0$ and $\mu \in \R^p$, we have $\varphi(\lambda, \mu) \le v(P)$.
+\end{theorem}
+
+\begin{proof}
+    If $x \in X$, i.e., $g(x) \le 0$ and $h(x) = 0$, then
+    \[
+        L(x, \lambda, \mu) = f(x) + \sum_{i=1}^{m} \lambda_i g_i(x) + \sum_{j=1}^{p} \mu_j h_j(x) \le f(x),
+    \]
+    hence
+    \[
+        \varphi(\lambda, \mu) = \inf_{x \in \R^n} L(x, \lambda, \mu) \le \inf_{x \in X} L(x, \lambda, \mu) \le \inf_{x \in X} f(x) = v(P). \qedhere
+    \]
+\end{proof}
+
+The dual function $\varphi$ has the following properties:
+\begin{itemize}
+    \item it is concave, because it is the infimum of affine functions w.r.t.\ $(\lambda, \mu)$;
+    \item it may be equal to $-\infty$ at some point;
+    \item it may be not differentiable at some point.
+\end{itemize}
+
+\subsubsection{Lagrangian dual problem}
+
+Each choice of $(\lambda, \mu)$ gives a lower bound, so it is natural to look for the best one.
+
+\begin{definition}[Lagrangian dual problem]
+    The problem
+    \[
+        \max \varphi(\lambda, \mu), \quad \lambda \ge 0,\ \mu \in \R^p \tag{D}
+    \]
+    is called \g{Lagrangian dual problem} of (P), and (P) is called \g{primal problem}.
+\end{definition}
+
+\begin{itemize}
+    \item The dual problem (D) consists in finding the best lower bound of $v(P)$.
+    \item (D) is always equivalent to a convex problem, even if (P) is non-convex: indeed, it is the maximization of a concave function on a convex set.
+\end{itemize}
+
+\Cref{thm:lower-bound} can be equivalently stated as follows.
+
+\begin{theorem}[Weak duality]
+    For any optimization problem (P), we have $v(D) \le v(P)$.
+\end{theorem}
+
+The previous inequality is called \g{weak duality property}.
+
+\begin{example}[Linear programming]
+    Primal problem:
+    \[
+        \begin{cases}
+            \min\, c^Tx\\
+            Ax \ge b
+        \end{cases} \tag{P}
+    \]
+    Lagrangian function: $L(x, \lambda) = c^Tx + \lambda^T(b - Ax) = \lambda^Tb + (c^T - \lambda^TA)x$.
+
+    Dual function:
+    \[
+        \varphi(\lambda) = \inf_{x \in \R^n} L(x, \lambda) =
+        \begin{cases}
+            -\infty & \text{if } c^T - \lambda^TA \neq 0,\\
+            \lambda^Tb & \text{if } c^T - \lambda^TA = 0.
+        \end{cases}
+    \]
+    Dual problem:
+    \[
+        \begin{cases}
+            \max\, \varphi(\lambda)\\
+            \lambda \ge 0
+        \end{cases}
+        \quad \longrightarrow \quad
+        \begin{cases}
+            \max\, \lambda^Tb\\
+            \lambda^TA = c^T\\
+            \lambda \ge 0
+        \end{cases} \tag{D}
+    \]
+    which is a linear programming problem.
+\end{example}
+
+\s{Exercise 4.2.} Find the dual of (D).
+
+\begin{example}[Least norm solution of linear equations]
+    Primal problem:
+    \[
+        \begin{cases}
+            \min\, \frac{1}{2}x^Tx\\
+            Ax = b
+        \end{cases} \tag{P}
+    \]
+    Lagrangian function: $L(x, \mu) = \frac{1}{2}x^Tx + \mu^T(b - Ax)$.
+
+    Dual function: $\varphi(\mu) = \inf_{x \in \R^n} L(x, \mu)$.
+
+    $L(x, \mu)$ is quadratic and strongly convex with respect to $x$, therefore
+    \[
+        \varphi(\mu) = \inf_{x \in \R^n} L(x, \mu) = \min_{x \in \R^n} L(x, \mu),
+    \]
+    thus the global optimum is the stationary point:
+    \[
+        \nabla_x L = x - A^T\mu = 0 \iff x = A^T\mu,
+    \]
+    hence $\varphi(\mu) = -\frac{1}{2}\mu^TAA^T\mu + b^T\mu$.
+
+    Dual problem:
+    \[
+        \begin{cases}
+            \max\, -\frac{1}{2}\mu^TAA^T\mu + b^T\mu\\
+            \mu \in \R^p
+        \end{cases} \tag{D}
+    \]
+    which is an unconstrained convex quadratic programming problem.
+\end{example}
+
+\s{Exercise 4.3.} Find the dual problem of a general convex quadratic programming problem
+\[
+    \begin{cases}
+        \min\, \frac{1}{2}x^TQx + c^Tx\\
+        Ax \le b
+    \end{cases} \tag{P}
+\]
+where $Q$ is a symmetric positive definite matrix.
+
+\subsubsection{Strong duality}
+
+Weak duality says that $v(D) \le v(P)$. The interesting case is when the two values coincide.
+
+\begin{definition}[Strong duality]
+    We say that \g{strong duality} holds for (P) if $v(D) = v(P)$ and (D) admits an optimal solution.
+\end{definition}
+
+Strong duality does not hold in general.
+
+\begin{example}
+    Consider the following (non-convex) problem:
+    \[
+        \begin{cases}
+            \min\, -x^2\\
+            x - 1 \le 0\\
+            -x \le 0
+        \end{cases} \tag{P}
+    \]
+    It is easy to check that $v(P) = -1$. The Lagrangian function is $L(x, \lambda) = -x^2 + \lambda_1(x - 1) - \lambda_2x$, hence
+    \[
+        \varphi(\lambda) = \inf_{x \in \R} L(x, \lambda) = -\infty \qquad \forall\, (\lambda_1, \lambda_2) \in \R^2,
+    \]
+    so $v(D) = -\infty$.
+\end{example}
+
+The next theorem provides sufficient conditions which guarantee strong duality for (P).
+
+\begin{theorem}
+    Suppose $f$, $g$, $h$ are continuously differentiable, the primal problem
+    \[
+        \begin{cases}
+            \min\, f(x)\\
+            g(x) \le 0\\
+            h(x) = 0
+        \end{cases} \tag{P}
+    \]
+    is convex, there exists a global optimum $x^*$ and ACQ holds at $x^*$. Then:
+    \begin{itemize}
+        \item strong duality holds ($v(D) = v(P)$ and (D) admits an optimal solution);
+        \item $(\lambda^*, \mu^*)$ is optimal for (D) if and only if $(\lambda^*, \mu^*)$ is a KKT multipliers vector associated with $x^*$.
+    \end{itemize}
+\end{theorem}
+
+\begin{proof}
+    $L(x, \lambda, \mu)$ is convex with respect to $x$ since (P) is convex. Since ACQ holds at $x^*$, by \cref{thm:kkt} there exists a KKT vector of multipliers associated with $x^*$. Let $(\lambda^*, \mu^*)$ be any such vector. Then
+    \[
+        \nabla_x L(x^*, \lambda^*, \mu^*) = 0, \qquad \lambda^* \ge 0, \qquad (\lambda^*)^Tg(x^*) = 0.
+    \]
+    Thus, using that $L$ is convex in $x$ (so a stationary point is a global minimum) and weak duality,
+    \[
+        \begin{aligned}
+            v(D) \ge \varphi(\lambda^*, \mu^*) &= \inf_x L(x, \lambda^*, \mu^*) = L(x^*, \lambda^*, \mu^*)\\
+            &= f(x^*) + (\lambda^*)^Tg(x^*) + (\mu^*)^Th(x^*) = f(x^*) = v(P) \ge v(D).
+        \end{aligned}
+    \]
+    Therefore $v(P) = v(D)$ and $(\lambda^*, \mu^*)$ is optimal for (D).
+
+    Vice versa, if $(\lambda^*, \mu^*)$ is any optimal solution for (D), then
+    \[
+        \begin{aligned}
+            f(x^*) &= v(P) = v(D) = \varphi(\lambda^*, \mu^*) = \inf_x L(x, \lambda^*, \mu^*) \le L(x^*, \lambda^*, \mu^*)\\
+            &= f(x^*) + (\lambda^*)^Tg(x^*) + (\mu^*)^Th(x^*)\\
+            &= f(x^*) + (\lambda^*)^Tg(x^*) \le f(x^*),
+        \end{aligned}
+    \]
+    thus $(\lambda^*)^Tg(x^*) = 0$ and $\inf_x L(x, \lambda^*, \mu^*) = L(x^*, \lambda^*, \mu^*)$, hence $\nabla_x L(x^*, \lambda^*, \mu^*) = 0$, i.e., $(\lambda^*, \mu^*)$ is a KKT multipliers vector associated with $x^*$.
+\end{proof}
+
+Convexity is sufficient but not necessary: strong duality may hold also for some non-convex problems.
+
+\begin{example}
+    Consider the (non-convex) problem
+    \[
+        \begin{cases}
+            \min\, -x_1^2 - x_2^2\\
+            x_1^2 + x_2^2 - 1 \le 0
+        \end{cases}
+    \]
+    We have $v(P) = -1$. The Lagrangian function is
+    \[
+        L(x, \lambda) = -x_1^2 - x_2^2 + \lambda(x_1^2 + x_2^2 - 1) = (\lambda - 1)x_1^2 + (\lambda - 1)x_2^2 - \lambda.
+    \]
+    The dual function is
+    \[
+        \varphi(\lambda) = \inf_{x \in \R^2} L(x, \lambda) =
+        \begin{cases}
+            -\infty & \text{if } \lambda < 1,\\
+            -\lambda & \text{if } \lambda \ge 1.
+        \end{cases}
+    \]
+    The dual problem is
+    \[
+        \begin{cases}
+            \max\, -\lambda\\
+            \lambda \ge 1
+        \end{cases}
+    \]
+    hence its optimal solution is $\lambda^* = 1$ and $v(D) = -1 = v(P)$.
+\end{example}
+
+Finally, strong duality can be characterized through the saddle points of the Lagrangian function.
+
+\begin{theorem}[Characterization of strong duality]
+    $(x^*, \lambda^*, \mu^*)$ is a \g{saddle point} of $L$, i.e.,
+    \[
+        L(x^*, \lambda, \mu) \le L(x^*, \lambda^*, \mu^*) \le L(x, \lambda^*, \mu^*) \qquad \forall\, x \in \R^n,\ \lambda \in \R^m_+,\ \mu \in \R^p,
+    \]
+    if and only if $x^*$ is optimal for (P), $(\lambda^*, \mu^*)$ is optimal for (D) and $v(P) = v(D)$.
+\end{theorem}
+
+\begin{proof}
+    If $(x^*, \lambda^*, \mu^*)$ is a saddle point of $L$, then we can prove that $x^* \in X$ and $\langle \lambda^*, g(x^*) \rangle = 0$, which implies $\varphi(\lambda^*, \mu^*) = f(x^*)$.
+
+    Vice versa, we have that
+    \[
+        f(x^*) = \varphi(\lambda^*, \mu^*) = \inf_{x \in \R^n} L(x, \lambda^*, \mu^*) \le L(x^*, \lambda^*, \mu^*) = f(x^*) + \langle \lambda^*, g(x^*) \rangle,
+    \]
+    hence $\langle \lambda^*, g(x^*) \rangle = 0$ and
+    \[
+        L(x^*, \lambda^*, \mu^*) = f(x^*) = \varphi(\lambda^*, \mu^*) \le L(x, \lambda^*, \mu^*) \qquad \forall\, x \in \R^n.
+    \]
+    Moreover
+    \[
+        L(x^*, \lambda, \mu) = f(x^*) + \langle \lambda, g(x^*) \rangle \le f(x^*) = L(x^*, \lambda^*, \mu^*)
+    \]
+    for all $\lambda \in \R^m_+$ and $\mu \in \R^p$.
+\end{proof}
