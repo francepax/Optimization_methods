@@ -1,0 +1,143 @@
+\section{Lesson 10 --- 23/10/2026}
+
+\subsection{Support Vector Machine SVM}
+
+\g{SVM} provides a supervised classification method for vectors of data: we have a set of labeled objects and we want to assess the class of a new object.
+
+\subsubsection{Linear SVM}
+
+Linear SVM can be applied to binary classification, where we have only two classes, represented by two separated sets $A, B \subset \R^n$. Assume that $A$ and $B$ are \s{strictly linearly separable}, i.e., there is a hyperplane
+$H = \{x \in \R^n : w^\top x + b = 0\}$ such that
+\begin{equation}
+    \begin{aligned}
+        w^\top x^i + b > 0 \quad & \forall x^i \in A, \\
+        w^\top x^j + b < 0 \quad & \forall x^j \in B.
+    \end{aligned}
+    \label{eq:separation}
+\end{equation}
+
+If we have a new point we use the decision function $f(x) = \operatorname{sign}(w^\top x + b)$, i.e., $f(x) = 1$ if $w^\top x + b > 0$ and $f(x) = -1$ if $w^\top x + b < 0$.
+
+A necessary and sufficient condition for \cref{eq:separation} to hold is that
+\[
+    \operatorname{conv}(A) \cap \operatorname{conv}(B) = \emptyset.
+\]
+
+The problem is that there are infinitely many hyperplanes separating the two sets, and we need to decide the optimal one.
+
+\begin{definition}[Margin of separation]
+    If $H$ is a separating hyperplane, the \g{margin of separation} of $H$ is the minimum distance between $H$ and $A \cup B$, i.e.,
+    \[
+        \rho(H) = \min_{x \in A \cup B} \frac{|w^\top x + b|}{\norm{w}}.
+    \]
+\end{definition}
+
+We then look for the hyperplane with the maximum margin of separation.
+
+\begin{theorem}
+    \label{thm:svm-primal}
+    Finding the separating hyperplane with the maximum margin of separation is equivalent to solving the convex quadratic programming problem
+    \begin{equation}
+        \begin{cases}
+            \displaystyle \min_{w, b} \ \frac{1}{2} \norm{w}^2 \\
+            w^\top x^i + b \ge 1 \quad \forall x^i \in A, \\
+            w^\top x^j + b \le -1 \quad \forall x^j \in B.
+        \end{cases}
+        \label{eq:svm-primal}
+    \end{equation}
+\end{theorem}
+
+\begin{proof}
+    The distance between the hyperplanes $w^\top x + b = 1$ and $w^\top x + b = -1$ is $\frac{2}{\norm{w}}$. In fact, consider a point $\hat{x}$ such that $w^\top \hat{x} + b = 1$. Its distance from the hyperplane $w^\top x + b + 1 = 0$ is
+    \[
+        \frac{|w^\top \hat{x} + b + 1|}{\norm{w}} = \frac{2}{\norm{w}}.
+    \]
+    Therefore, by minimizing $\norm{w}$, we get two hyperplanes of maximum distance.
+\end{proof}
+
+Moreover, we will see that problem \cref{eq:svm-primal} has a unique solution $(w^*, b^*)$.
+
+\subsubsection{Equivalent formulation and dual problem}
+
+Let $\ell = |A \cup B|$. For any point $x^i \in A \cup B$, define the label
+\[
+    y^i =
+    \begin{cases}
+        1 & \text{if } x^i \in A, \\
+        -1 & \text{if } x^i \in B,
+    \end{cases}
+    \qquad i = 1, \dots, \ell.
+\]
+Then problem \cref{eq:svm-primal} is equivalent to
+\begin{equation}
+    \begin{cases}
+        \displaystyle \min_{w, b} \ \frac{1}{2} \norm{w}^2 \\
+        1 - y^i (w^\top x^i + b) \le 0 \quad \forall i = 1, \dots, \ell.
+    \end{cases}
+    \label{eq:svm-labels}
+\end{equation}
+Since problem \cref{eq:svm-labels} is convex, it is useful to consider its Lagrangian dual.
+
+The Lagrangian function is
+\begin{align*}
+    L(w, b, \lambda) &= \frac{1}{2} \norm{w}^2 + \sum_{i=1}^{\ell} \lambda_i \bigl(1 - y^i (w^\top x^i + b)\bigr) \\
+    &= \frac{1}{2} \norm{w}^2 - \sum_{i=1}^{\ell} \lambda_i y^i w^\top x^i - b \sum_{i=1}^{\ell} \lambda_i y^i + \sum_{i=1}^{\ell} \lambda_i.
+\end{align*}
+\begin{itemize}
+    \item If $\sum_{i=1}^{\ell} \lambda_i y^i \ne 0$, then $\inf_{w, b} L(w, b, \lambda) = -\infty$.
+    \item If $\sum_{i=1}^{\ell} \lambda_i y^i = 0$, then $L$ does not depend on $b$ and it is strongly convex w.r.t.\ $w$, so the optimal solution of $\min_w L(w, b, \lambda)$ is the (unique) stationary point
+    \begin{equation}
+        \nabla_w L(w, b, \lambda) = w - \sum_{i=1}^{\ell} \lambda_i y^i x^i = 0.
+        \label{eq:stationary}
+    \end{equation}
+\end{itemize}
+
+Note that, if \cref{eq:stationary} holds and $\sum_{i=1}^{\ell} \lambda_i y^i = 0$, then
+\[
+    L(w, b, \lambda) = \frac{1}{2} w^\top w - w^\top w + \sum_{i=1}^{\ell} \lambda_i = -\frac{1}{2} w^\top w + \sum_{i=1}^{\ell} \lambda_i.
+\]
+Therefore, the dual function is
+\[
+    \varphi(\lambda) =
+    \begin{cases}
+        -\infty & \text{if } \sum_{i=1}^{\ell} \lambda_i y^i \ne 0, \\[1ex]
+        \displaystyle -\frac{1}{2} \sum_{i=1}^{\ell} \sum_{j=1}^{\ell} y^i y^j (x^i)^\top x^j \lambda_i \lambda_j + \sum_{i=1}^{\ell} \lambda_i & \text{if } \sum_{i=1}^{\ell} \lambda_i y^i = 0.
+    \end{cases}
+\]
+
+The dual of problem \cref{eq:svm-labels} is
+\begin{equation}
+    \begin{cases}
+        \displaystyle \max_{\lambda} \ -\frac{1}{2} \sum_{i=1}^{\ell} \sum_{j=1}^{\ell} y^i y^j (x^i)^\top x^j \lambda_i \lambda_j + \sum_{i=1}^{\ell} \lambda_i \\
+        \displaystyle \sum_{i=1}^{\ell} \lambda_i y^i = 0, \\
+        \lambda \ge 0,
+    \end{cases}
+    \label{eq:svm-dual}
+\end{equation}
+or, in matrix form,
+\[
+    \begin{cases}
+        \displaystyle \max_{\lambda} \ -\frac{1}{2} \lambda^\top X^\top X \lambda + e_\ell^\top \lambda \\
+        \displaystyle \sum_{i=1}^{\ell} \lambda_i y^i = 0, \\
+        \lambda \ge 0,
+    \end{cases}
+\]
+where $X = (y^1 x^1, y^2 x^2, \dots, y^\ell x^\ell)$ is an $n \times \ell$ matrix and $e_\ell^\top = (1, \dots, 1) \in \R^\ell$.
+
+\begin{remark}
+    \begin{itemize}
+        \item Since $X^\top X$ is always positive semidefinite, the dual problem is a convex quadratic programming problem.
+        \item A KKT multiplier $\lambda^*$ associated to the primal optimum $(w^*, b^*)$ is a dual optimum.
+        \item If $\lambda^*_i > 0$, then $x^i$ is called a \g{support vector}.
+        \item If $\lambda^*$ is a dual optimum, then by \cref{eq:stationary} we have
+        \[
+            w^* = \sum_{i=1}^{\ell} \lambda^*_i y^i x^i.
+        \]
+        \item $b^*$ is obtained using the complementarity conditions
+        \[
+            \lambda^*_i \bigl(1 - y^i ((w^*)^\top x^i + b^*)\bigr) = 0.
+        \]
+        In fact, if $i$ is such that $\lambda^*_i > 0$, then $b^* = \frac{1}{y^i} - (w^*)^\top x^i$.
+        \item This allows us to find the separating hyperplane $(w^*)^\top x + b^* = 0$ and the decision function $f(x) = \operatorname{sign}((w^*)^\top x + b^*)$.
+    \end{itemize}
+\end{remark}
