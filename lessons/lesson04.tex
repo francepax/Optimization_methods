@@ -1,6 +1,51 @@
 % !TEX root = ../main.tex
 \section{Lesson 04 --- 02/10/2026}
 
+\subsection{Convexity of quadratic functions}
+
+A first important application of the second order conditions is the quadratic case. Let
+\[
+    f(x) = \frac{1}{2}x^TQx + c^Tx,
+\]
+where $Q$ is an $n \times n$ symmetric matrix and $c \in \R^n$. It is easy to check that $\nabla f(x) = Qx + c$, so $Q$ is the Hessian of $f$. Then $f$ is:
+\begin{itemize}
+    \item convex if and only if $Q$ is positive semidefinite;
+    \item strongly convex if and only if $Q$ is positive definite;
+    \item concave if and only if $Q$ is negative semidefinite;
+    \item strongly concave if and only if $Q$ is negative definite.
+\end{itemize}
+
+\subsection{Operations that preserve convexity of functions}
+
+In practice, convex functions are rarely checked from the definition: we build them from simple ones using operations that preserve convexity.
+
+\begin{theorem}
+\leavevmode
+\begin{itemize}
+    \item If $f$ is convex and $k > 0$, then $kf$ is convex.
+    \item If $f_1$ and $f_2$ are convex, then $f_1 + f_2$ is convex.
+    \item If $f$ is convex, then $f(Ax + b)$ is convex.
+\end{itemize}
+\end{theorem}
+
+\begin{example}
+\leavevmode
+\begin{itemize}
+    \item Log barrier for linear inequalities: $f(x) = -\sum_{i=1}^{m}\log(b_i - a_i^Tx)$ on $C = \{x : b_i - a_i^Tx > 0\ \forall i\}$.
+    \item Norm of an affine function: $f(x) = \norm{Ax + b}$.
+\end{itemize}
+\end{example}
+
+\begin{theorem}[Pointwise maximum]
+If $f_1, \dots, f_m$ are convex, then $f(x) = \max\{f_1(x), \dots, f_m(x)\}$ is convex. More generally, if $\{f_i\}_{i \in I}$ is any family of convex functions, then $f(x) = \sup_{i \in I} f_i(x)$ is convex.
+\end{theorem}
+
+\begin{example}
+If $\psi(x, \lambda): \R^n \times \R^m \to \R$ is convex in $x$ and concave in $\lambda$, then $p(x) = \sup_\lambda \psi(x, \lambda)$ is convex and $d(\lambda) = \inf_x \psi(x, \lambda)$ is concave.
+\end{example}
+
+The last example will be useful when we study duality, since the dual function is an infimum of functions that are affine in the multipliers.
+
 \subsection{Optimization problem in standard form}
 
 \begin{definition}[Optimization problem]
@@ -82,6 +127,8 @@ for some $r > 0$.
 \end{example}
 
 \subsection{Existence of global optima}
+
+The examples above show that an optimum may fail to exist. We now give sufficient conditions for its existence.
 
 \begin{theorem}[Weierstrass]
 If the objective function $f$ is continuous and the feasible region $X$ is closed and bounded, then (at least) a global optimum exists.

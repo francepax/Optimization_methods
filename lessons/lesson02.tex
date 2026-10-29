@@ -2,67 +2,111 @@
 
 \section{Lesson 02 --- 25/09/2026}
 
-\subsection{Example on balls}
-we start the lesson by giving some example of balls
-exercise 1.1
-    find the unit ball $B(0,1)$ w.r.t $\|.\|_1, \| . \|_\infty \space \text{and} \space \|.\|_A where $
-    \[ A = \begin{bmatrix}
-        4 & 0 \\
-        0 & 1
-    \end{bmatrix}
-    \]
+\subsection{Examples on balls}
+We start the lesson with some examples on balls.
 
-$\| x \|_1= |x_1|+|x_2| \quad B(1,0) = \{ (x_1,x_2): \left\|x\right\|_1 \le 1\}\implies|x_1|+|x_2|\le1 \\$
-
- \[
- |x_1|+|x_2| =
-  \begin{cases}
-    x_1 + x_2  \\
-    x_1 - x_2 \\
-    x_2 -x_1 \\
-    -x_1 -x_2
-  \end{cases}
+\begin{example}[Exercise 1.1]
+Find the unit ball $B(0,1)$ w.r.t.\ $\norm{\cdot}_1$, $\norm{\cdot}_\infty$ and $\norm{\cdot}_A$, where
+\[ A = \begin{bmatrix}
+    4 & 0 \\
+    0 & 1
+\end{bmatrix}.
 \]
-
-These four equations need to be all less or equal then 1 so they draw a square rotated by 45 degrees intercepting $1$ or$ -1$ on the axis, that is our Ball and it is a convex set.\\
-
-ToDo $\infty$\\
-
-Now if we consider A norm.\\
-
-$\left\|x\right\|_A = \sqrt{x^tAX}\\
-x^tAx = \begin{bmatrix}x_1 & x_2\end{bmatrix}\begin{bmatrix}
+\begin{itemize}
+    \item For $\norm{x}_1 = |x_1|+|x_2|$ the ball is $B(0,1) = \{ x : |x_1|+|x_2|\le1\}$. Since
+    \[
+     |x_1|+|x_2| =
+      \max\{x_1 + x_2,\ x_1 - x_2,\ -x_1 + x_2,\ -x_1 - x_2\},
+    \]
+    all four expressions must be $\le 1$, so the ball is a square rotated by 45 degrees, with vertices $(\pm 1, 0)$, $(0, \pm 1)$.
+    \item For $\norm{x}_\infty = \max\{|x_1|, |x_2|\}$ the ball is $\{x : |x_1| \le 1,\ |x_2| \le 1\}$, i.e.\ the square $[-1,1]^2$.
+    \item For $\norm{x}_A = \sqrt{x^TAx}$ we have
+    \[
+        x^TAx = \begin{bmatrix}x_1 & x_2\end{bmatrix}\begin{bmatrix}
         4 & 0 \\
         0 & 1
-    \end{bmatrix}\begin{bmatrix}x_1 \\ x_2\end{bmatrix} = 4{x_1}^2 + {x_2}^2 \le 1 \quad \text{That's an ellipse}$\\
-
-Exercise 2:\\
-Prove that $B(0,1)=\{x \in \mathbb{R}^n:\left\|x\right\|\le1\}\text{is convex for any norm}$\\
-Let $x,y \in B(0,1),$ I have to prove that$\alpha x + (1-\alpha)y \in B(0,1),\quad \forall \alpha \in[0,1]\\$
-$\implies \left\| \alpha x + (1-\alpha)y \right\| \le 1 \quad  \forall \alpha \in[0,1]\\ \quad \left\| \alpha x + (1-\alpha)y \right\| \le \left\| \alpha x\right\| + \left\|(1-\alpha)y\right\|=\alpha\left\|x\right\|+ (1-\alpha)\left\|y\right\| \le \alpha * 1 + (1-\alpha)*1 = 1$
-\\
-\\
-\subsection{Operation that preserve convexity}
-Algebraic operations:
-\begin{lemma}
-    If $C_1  \text{and}C_2$ are convex, then $C_1 + C_2\doteq \{x+y: x \in C_1, y \in C_2\} $ is convex.\\
-    If $C_1  \text{and} C_2$ are convex, then $C_1 - C_2\doteq \{x-y: x \in C_1, y \in C_2\} $ is convex.
-\end{lemma}
-Topological operations:
-\begin{lemma}
-    if $C$ is ocnvex then$ cl(C) $is convex.
-    if $C$ is ocnvex then$ int(C) $is convex, provided that\\ $int(C)\ne \emptyset $.
-\end{lemma}
-
-\subsection{Relative interior}
-Given a set $ C \subseteq R^n $ we denote by $aff(C)$ teh smallest affine set containing $C$.
-\begin{definition}[Relative interior]
-    Let $ C \subseteq R^n $ be a convex set.\\
-    The relative interior of $C$ is define by\\
-    \[
-        ri(C)=\{x \in C : \exists\,\epsilon > 0\  s.t.\ aff(C) \cap B(x,\epsilon)\subset C\subseteq  \}
+    \end{bmatrix}\begin{bmatrix}x_1 \\ x_2\end{bmatrix} = 4x_1^2 + x_2^2 \le 1,
     \]
+    which is an ellipse.
+\end{itemize}
+All of them are convex sets.
+\end{example}
+
+The fact that these balls are all convex is not a coincidence.
+
+\begin{example}[Exercise 1.4]
+Prove that $B(0,1)=\{x \in \R^n:\norm{x}\le1\}$ is convex for any norm.
+
+Let $x,y \in B(0,1)$; we have to prove that $\alpha x + (1-\alpha)y \in B(0,1)$ for all $\alpha \in[0,1]$. By the triangle inequality and homogeneity,
+\[
+    \norm{\alpha x + (1-\alpha)y} \le \norm{\alpha x} + \norm{(1-\alpha)y} = \alpha\norm{x}+ (1-\alpha)\norm{y} \le \alpha + (1-\alpha) = 1.
+\]
+\end{example}
+
+\subsection{Operations that preserve convexity}
+
+\subsubsection{Algebraic operations}
+
+\begin{lemma}
+If $C_1$ and $C_2$ are convex, then $C_1 + C_2\coloneqq \{x+y: x \in C_1, y \in C_2\}$ is convex.
+If $C$ is convex and $\alpha \in \R$, then $\alpha C \coloneqq \{\alpha x : x \in C\}$ is convex.
+Consequently, $C_1 - C_2\coloneqq \{x-y: x \in C_1, y \in C_2\}$ is convex.
+\end{lemma}
+
+\subsubsection{Topological operations}
+
+\begin{lemma}
+If $C$ is convex then $\mathrm{cl}(C)$ is convex.
+If $C$ is convex then $\mathrm{int}(C)$ is convex, provided that $\mathrm{int}(C)\ne \emptyset$.
+\end{lemma}
+
+The interior of a convex set can be empty even when the set is ``reasonable'' (e.g.\ a segment in $\R^2$). For this reason it is useful to look at the interior relative to the smallest affine set containing $C$. We denote by $\mathrm{aff}(C)$ the smallest affine set containing $C$.
+
+\begin{definition}[Relative interior]
+Let $C \subseteq \R^n$ be a convex set. The \emph{relative interior} of $C$ is
+\[
+    \mathrm{ri}(C)=\{x \in C : \exists\,\epsilon > 0\ \text{s.t.}\ \mathrm{aff}(C) \cap B(x,\epsilon)\subseteq C\}.
+\]
 \end{definition}
 
+\begin{example}
+Let $C \coloneqq \{(x_1, x_2) \in \R^2 : 1 \le x_1 \le 3,\ x_2 = 0\}$. Then $\mathrm{ri}(C) = \{(x_1, x_2) : 1 < x_1 < 3,\ x_2 = 0\}$, while $\mathrm{int}(C) = \emptyset$. If $C = \{\bar{x}\}$, then $\mathrm{ri}(C) = C$.
+\end{example}
 
-convex cone ToDo
+\begin{theorem}
+If $C$ is a nonempty convex set in $\R^n$, then $\mathrm{ri}(C)$ is a nonempty convex set.
+\end{theorem}
+
+\subsubsection{Separation of convex sets}
+
+The relative interior is what is needed to state when two convex sets can be separated by a hyperplane.
+
+Two sets $A, B \subseteq \R^n$ are \emph{linearly separable} if there exist $a \in \R^n$, $a \ne 0$, and $\beta \in \R$ such that
+\[
+    a^Tx \ge \beta \quad \forall x \in A, \qquad a^Tx \le \beta \quad \forall x \in B.
+\]
+The separation is \emph{proper} if the strict inequality holds for at least one $x \in A \cup B$.
+
+\begin{theorem}[Separation]
+Let $A, B$ be nonempty convex sets in $\R^n$. Then $A$ and $B$ are properly linearly separable if and only if
+\[
+    \mathrm{ri}(A) \cap \mathrm{ri}(B) = \emptyset.
+\]
+In particular, two disjoint convex sets are always properly linearly separable.
+\end{theorem}
+
+\begin{example}
+Let $A \coloneqq \{x \in \R^2 : 1 \le x_1 \le 2,\ x_2 = 0\}$ and $B \coloneqq \{x \in \R^2 : 2 \le x_1 \le 4,\ x_2 = 0\}$. Then $\mathrm{ri}(A) \cap \mathrm{ri}(B) = \emptyset$ and the sets are properly separable by the hyperplane $x_1 = 2$.
+\end{example}
+
+\subsubsection{Affine transformations}
+
+\begin{theorem}
+Let $f: \R^n \to \R^m$ be affine, i.e.\ $f(x) = Ax + b$, with $A \in \R^{m \times n}$, $b \in \R^m$.
+\begin{itemize}
+    \item If $C \subseteq \R^n$ is convex, then $f(C) = \{f(x) : x \in C\}$ is convex.
+    \item If $C \subseteq \R^m$ is convex, then $f^{-1}(C) = \{x \in \R^n : f(x) \in C\}$ is convex.
+\end{itemize}
+\end{theorem}
+
+Examples of affine maps are the scaling $f(x) = \alpha x$, the translation $f(x) = x + b$ and the rotation $f(x) = \begin{bmatrix} \cos\theta & -\sin\theta\\ \sin\theta & \cos\theta\end{bmatrix} x$.
