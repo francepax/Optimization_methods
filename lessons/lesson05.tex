@@ -8,7 +8,11 @@ Let $x^*$ be a local optimum of (P), i.e., there is $r>0$ s.t.
 \[
     f(x^*)\le f(z) \quad \forall z \in X \cap B(x^*,r).
 \]
-Continue on slide.
+By contradiction, assume that $x^*$ is not a global optimum. Then there exists $y \in X$ such that $f(y) < f(x^*)$. Take $\alpha \in (0,1)$ such that $\alpha x^* + (1-\alpha)y \in B(x^*,r)$; this point belongs to $X$ since $X$ is convex. Then, by local optimality and convexity of $f$,
+\[
+    f(x^*) \le f(\alpha x^* + (1-\alpha)y) \le \alpha f(x^*) + (1-\alpha)f(y) < \alpha f(x^*) + (1-\alpha)f(x^*) = f(x^*),
+\]
+which is impossible.
 \end{proof}
 
 \begin{proposition}
