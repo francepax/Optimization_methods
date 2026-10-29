@@ -1,0 +1,196 @@
+\section{Lesson 11 --- 29/10/2026}
+
+\subsection{Linear SVM with soft margin}
+
+What if sets $A$ and $B$ are not linearly separable?\\
+The linear system
+\[
+    1 - y^i (w^\top x^i + b) \le 0 \qquad i = 1, \dots, \ell
+\]
+has no solutions. We add some \g{slack variables} $\xi_i \ge 0$, as few as possible, and we consider the relaxed system
+\[
+    \begin{aligned}
+        1 - y^i (w^\top x^i + b) &\le \xi_i \qquad i = 1, \dots, \ell, \\
+        \xi_i &\ge 0 \qquad\ \ \, i = 1, \dots, \ell.
+    \end{aligned}
+\]
+If $x^i$ is misclassified, then $\xi_i > 1$, thus $\sum_{i=1}^{\ell} \xi_i$ is an upper bound of the number of misclassified points. In fact:
+\begin{itemize}
+    \item $x^i \in A$ with $w^\top x^i + b < 0$ implies $1 < 1 - (w^\top x^i + b) = 1 - y^i (w^\top x^i + b) \le \xi_i$;
+    \item $x^i \in B$ with $w^\top x^i + b > 0$ implies $1 < 1 + (w^\top x^i + b) = 1 - y^i (w^\top x^i + b) \le \xi_i$.
+\end{itemize}
+
+We redefine the objective function by adding the term $C\sum_{i=1}^{\ell}\xi_i$, where $C > 0$ is a parameter, that represents the error we make:
+\begin{equation}
+    \begin{cases}
+        \displaystyle \min_{w, b, \xi} \ \frac{1}{2} \norm{w}^2 + C \sum_{i=1}^{\ell} \xi_i \\
+        1 - y^i (w^\top x^i + b) \le \xi_i \quad \forall i = 1, \dots, \ell, \\
+        \xi_i \ge 0 \quad \forall i = 1, \dots, \ell.
+    \end{cases}
+    \label{eq:svm-soft}
+\end{equation}
+
+\begin{example}[Exercise 5.2]
+    The dual problem of \cref{eq:svm-soft} is
+    \begin{equation}
+        \begin{cases}
+            \displaystyle \max_{\lambda} \ -\frac{1}{2} \sum_{i=1}^{\ell} \sum_{j=1}^{\ell} y^i y^j (x^i)^\top x^j \lambda_i \lambda_j + \sum_{i=1}^{\ell} \lambda_i \\
+            \displaystyle \sum_{i=1}^{\ell} \lambda_i y^i = 0, \\
+            0 \le \lambda_i \le C \quad i = 1, \dots, \ell.
+        \end{cases}
+        \label{eq:svm-soft-dual}
+    \end{equation}
+    \begin{proof}
+        The Lagrangian function is
+        \begin{align*}
+            L(w, b, \xi, \lambda, \mu) &= \frac{1}{2} \norm{w}^2 + C \sum_{i=1}^{\ell} \xi_i + \sum_{i=1}^{\ell} \lambda_i \bigl(1 - y^i (w^\top x^i + b) - \xi_i\bigr) - \sum_{i=1}^{\ell} \mu_i \xi_i \\
+            &= \frac{1}{2} \norm{w}^2 - \sum_{i=1}^{\ell} \lambda_i y^i w^\top x^i - b \sum_{i=1}^{\ell} \lambda_i y^i + \sum_{i=1}^{\ell} \lambda_i + \sum_{i=1}^{\ell} \xi_i (C - \lambda_i - \mu_i).
+        \end{align*}
+        For fixed $(\lambda, \mu) \in \R^\ell_+ \times \R^\ell_+$, $L$ is convex w.r.t.\ $(w, b, \xi)$, so a global minimum is a stationary point, i.e., a solution of
+        \begin{equation}
+            \begin{cases}
+                \displaystyle \nabla_w L = w - \sum_{i=1}^{\ell} \lambda_i y^i x^i = 0, \\
+                \displaystyle \nabla_b L = - \sum_{i=1}^{\ell} \lambda_i y^i = 0, \\
+                \nabla_{\xi_i} L = C - \lambda_i - \mu_i = 0 \quad i = 1, \dots, \ell.
+            \end{cases}
+            \label{eq:soft-stationary}
+        \end{equation}
+        If \cref{eq:soft-stationary} does not hold, then $\inf L = -\infty$. Otherwise the last sum in $L$ vanishes and, eliminating $w$ with the same arguments used for the dual \cref{eq:svm-dual}, we get
+        \[
+            \begin{cases}
+                \displaystyle \max_{\lambda, \mu} \ -\frac{1}{2} \sum_{i=1}^{\ell} \sum_{j=1}^{\ell} y^i y^j (x^i)^\top x^j \lambda_i \lambda_j + \sum_{i=1}^{\ell} \lambda_i \\
+                \displaystyle \sum_{i=1}^{\ell} \lambda_i y^i = 0, \\
+                C - \lambda_i - \mu_i = 0 \quad i = 1, \dots, \ell, \\
+                \lambda \ge 0, \ \mu \ge 0.
+            \end{cases}
+        \]
+        Eliminating $\mu$, since $\mu_i = C - \lambda_i \ge 0$, we obtain $0 \le \lambda_i \le C$, i.e., \cref{eq:svm-soft-dual}.
+    \end{proof}
+\end{example}
+
+If $\lambda^*$ is optimal for \cref{eq:svm-soft-dual}, then
+\[
+    w^* = \sum_{i=1}^{\ell} \lambda^*_i y^i x^i.
+\]
+We find $b^*$ by choosing $i$ such that $0 < \lambda^*_i < C$ and using the complementarity conditions
+\begin{equation}
+    \begin{cases}
+        \lambda^*_i \bigl(1 - y^i ((w^*)^\top x^i + b^*) - \xi^*_i\bigr) = 0, \\
+        \mu^*_i \xi^*_i = (C - \lambda^*_i) \xi^*_i = 0.
+    \end{cases}
+    \label{eq:soft-compl}
+\end{equation}
+Thus $b^* = \frac{1}{y^i} - (w^*)^\top x^i$.
+
+\begin{remark}
+    From \cref{eq:soft-compl} we have
+    \begin{itemize}
+        \item $0 \le \lambda^*_i < C$ implies $\xi^*_i = 0$;
+        \item $0 < \lambda^*_i \le C$ implies $1 - y^i ((w^*)^\top x^i + b^*) - \xi^*_i = 0$;
+        \item $\xi^*_i > 0$ implies $\lambda^*_i = C$.
+    \end{itemize}
+    These conditions also allow us to find the errors $\xi^*_i$, $i = 1, \dots, \ell$.
+\end{remark}
+
+\subsection{Nonlinear SVM}
+
+If two sets $A$ and $B$ are not linearly separable, we ask ourselves: are they linearly separable in another space? To answer this we use a map $\varphi \colon \R^n \to H$, where $H$ is a higher dimensional (maybe infinite) space called \g{feature space}. We try to linearly separate the images $\varphi(x^i)$, $i = 1, \dots, \ell$, in the feature space.
+
+The primal problem is
+\begin{equation}
+    \begin{cases}
+        \displaystyle \min_{w, b, \xi} \ \frac{1}{2} \norm{w}^2 + C \sum_{i=1}^{\ell} \xi_i \\
+        1 - y^i (w^\top \varphi(x^i) + b) \le \xi_i \quad \forall i = 1, \dots, \ell, \\
+        \xi_i \ge 0 \quad \forall i = 1, \dots, \ell,
+    \end{cases}
+    \label{eq:svm-nl-primal}
+\end{equation}
+where $w$ is a vector in a high dimensional space (maybe infinitely many variables).
+
+The dual problem is
+\begin{equation}
+    \begin{cases}
+        \displaystyle \max_{\lambda} \ -\frac{1}{2} \sum_{i=1}^{\ell} \sum_{j=1}^{\ell} y^i y^j \varphi(x^i)^\top \varphi(x^j) \lambda_i \lambda_j + \sum_{i=1}^{\ell} \lambda_i \\
+        \displaystyle \sum_{i=1}^{\ell} \lambda_i y^i = 0, \\
+        0 \le \lambda_i \le C \quad \forall i = 1, \dots, \ell,
+    \end{cases}
+    \label{eq:svm-nl-dual}
+\end{equation}
+and the number of variables is equal to the number of training data.
+
+Let $\lambda^*$ be a solution of the dual problem. Then
+\[
+    w^* = \sum_{i=1}^{\ell} \lambda^*_i y^i \varphi(x^i).
+\]
+By any $\lambda^*_i$ such that $0 < \lambda^*_i < C$ we can find $b^*$ by the complementarity relations, that now become
+\begin{equation}
+    \begin{cases}
+        \lambda^*_i \bigl(1 - y^i ((w^*)^\top \varphi(x^i) + b^*) - \xi^*_i\bigr) = 0, \\
+        \mu^*_i \xi^*_i = (C - \lambda^*_i) \xi^*_i = 0.
+    \end{cases}
+    \label{eq:soft-compl-nl}
+\end{equation}
+Then
+\[
+    1 - y^i \bigl((w^*)^\top \varphi(x^i) + b^*\bigr) = 0 \quad \longrightarrow \quad b^* = \frac{1}{y^i} - \sum_{j=1}^{\ell} \lambda^*_j y^j \varphi(x^j)^\top \varphi(x^i).
+\]
+The decision function is given by
+\[
+    f(x) = \operatorname{sign}\bigl((w^*)^\top \varphi(x) + b^*\bigr) = \operatorname{sign}\Bigl(\sum_{i=1}^{\ell} \lambda^*_i y^i \varphi(x^i)^\top \varphi(x) + b^*\Bigr).
+\]
+Note that $f(x)$ depends on
+\begin{itemize}
+    \item $\lambda^*$, that can be found knowing $\varphi(x^i)^\top \varphi(x^j)$;
+    \item $\varphi(x^i)^\top \varphi(x)$;
+    \item $b^*$, that can be found knowing $\varphi(x^i)^\top \varphi(x^j)$.
+\end{itemize}
+
+\subsubsection{Kernel function}
+
+\begin{definition}[Kernel function]
+    A function $k \colon \R^n \times \R^n \to \R$ is called \g{kernel} if there exists a map $\varphi \colon \R^n \to H$ such that
+    \[
+        k(x, y) = \langle \varphi(x), \varphi(y) \rangle,
+    \]
+    where $\langle \cdot, \cdot \rangle$ is a scalar product in the feature space $H$.
+\end{definition}
+
+Examples of kernels:
+\begin{itemize}
+    \item $k(x, y) = x^\top y$;
+    \item $k(x, y) = (x^\top y + 1)^p$, with $p \ge 1$ \s{(polynomial)};
+    \item $k(x, y) = e^{-\gamma \norm{x - y}^2}$ \s{(Gaussian)};
+    \item $k(x, y) = \tanh(\beta x^\top y + \gamma)$, with suitable $\beta$ and $\gamma$.
+\end{itemize}
+
+\begin{theorem}
+    If $k \colon \R^n \times \R^n \to \R$ is a kernel and $x^1, \dots, x^\ell \in \R^n$, then the matrix $K$ defined by
+    \[
+        K_{ij} = k(x^i, x^j)
+    \]
+    is positive semidefinite.
+\end{theorem}
+
+The dual problem depends on the kernel $k$:
+\[
+    \begin{cases}
+        \displaystyle \max_{\lambda} \ -\frac{1}{2} \sum_{i=1}^{\ell} \sum_{j=1}^{\ell} y^i y^j k(x^i, x^j) \lambda_i \lambda_j + \sum_{i=1}^{\ell} \lambda_i \\
+        \displaystyle \sum_{i=1}^{\ell} \lambda_i y^i = 0, \\
+        0 \le \lambda_i \le C \quad i = 1, \dots, \ell.
+    \end{cases}
+\]
+
+The method is:
+\begin{itemize}
+    \item choose a kernel $k$;
+    \item find an optimal solution $\lambda^*$ of the dual;
+    \item choose $i$ such that $0 < \lambda^*_i < C$ and find
+    \[
+        b^* = \frac{1}{y^i} - \sum_{j=1}^{\ell} \lambda^*_j y^j k(x^i, x^j);
+    \]
+    \item the decision function is
+    \[
+        f(x) = \operatorname{sign}\Bigl(\sum_{i=1}^{\ell} \lambda^*_i y^i k(x^i, x) + b^*\Bigr).
+    \]
+\end{itemize}
+The separating surface $f(x) = 0$ is linear in the feature space and nonlinear in the input space.
