@@ -1,0 +1,591 @@
+\documentclass[11pt,a4paper]{article}
+
+% Language and fonts
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1.5cm]{geometry}
+\usepackage[expansion=false]{microtype}
+
+% Math
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{bm, cancel}
+
+% Tables and lists
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+
+% Optimization problems and tableaux
+\usepackage{optidef}
+\usepackage{nicematrix}
+
+% Graphics
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, quotes}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+
+% Algorithms
+\usepackage[english,ruled,vlined]{algorithm2e}
+
+% Colors and boxes
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+
+% Links (keep these last)
+\usepackage[colorlinks=true, linkcolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+\usepackage{cleveref}
+
+% Shortcuts
+\newcommand{\s}{\textit}
+\newcommand{\g}{\texttt}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% Theorem-like environments (shared counter)
+\newtheoremstyle{breakdef}{\topsep}{\topsep}{\normalfont}{}{\bfseries}{.}{\newline}{}
+\newtheoremstyle{breakplain}{\topsep}{\topsep}{\itshape}{}{\bfseries}{.}{\newline}{}
+
+\theoremstyle{breakdef}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}[definition]{Example}
+\theoremstyle{breakplain}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{corollary}[definition]{Corollary}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+% Colored boxes
+\tcbset{notebox/.style={enhanced, breakable,
+  colback=#1!5, colframe=#1!60!black,
+  boxrule=0.6pt, arc=2mm,
+  left=2mm, right=2mm, top=1mm, bottom=1mm}}
+\tcolorboxenvironment{definition}{notebox=blue}
+\tcolorboxenvironment{theorem}{notebox=red}
+\tcolorboxenvironment{lemma}{notebox=orange}
+\tcolorboxenvironment{example}{notebox=green}
+\tcolorboxenvironment{proposition}{notebox=violet}
+\tcolorboxenvironment{corollary}{notebox=teal}
+
+% Importanza per risolvere gli esercizi: \imp{1} bassa, \imp{2} media, \imp{3} alta
+\definecolor{impcolor}{RGB}{200,140,0}
+\newcommand{\imp}[1]{\textcolor{impcolor}{%
+  \ifcase#1\or$\bigstar$\or$\bigstar\bigstar$\or$\bigstar\bigstar\bigstar$\fi}\ }
+
+\title{Optimization Methods -- Formulario}
+\author{Francesco Passino}
+\date{}
+
+\begin{document}
+\maketitle
+
+% Aggiungere qui sotto le definizioni e i teoremi scelti, in un unico elenco, ciascuno con imp 1..3.
+
+\begin{definition}[Convex set]
+\imp{3}A set $C \subseteq \R^n$ is \emph{convex} if, for every $x, y \in C$ and every $\alpha \in [0,1]$,
+\[
+  \alpha x + (1-\alpha) y \in C.
+\]
+\end{definition}
+
+\begin{definition}[Affine set]
+\imp{2}A set $C \subseteq \R^n$ is \emph{affine} if, for every $x, y \in C$ and every $\alpha \in \R$,
+\[
+  \alpha x + (1-\alpha) y \in C.
+\]
+\end{definition}
+
+\begin{definition}[Ball]
+\imp{1}A \emph{ball} is $B(\bar{x}, r) \coloneqq \{z \in \R^n : \norm{z - \bar{x}} \le r\}$, where $\norm{\cdot}$ is any norm, e.g.
+\begin{itemize}
+    \item $\norm{x}_2 = \sqrt{\sum_i x_i^2}$ (Euclidean norm);
+    \item $\norm{x}_1 = \sum_i |x_i|$ (Manhattan distance);
+    \item $\norm{x}_\infty = \max_i |x_i|$ (Chebyshev norm);
+    \item $\norm{x}_p = \big(\sum_i |x_i|^p\big)^{1/p}$, with $1 \le p < +\infty$;
+    \item $\norm{x}_A = \sqrt{x^TAx}$, with $A$ symmetric and positive definite, i.e.\ $x^TAx > 0$ for all $x \neq 0$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Relative interior]
+\imp{1}Let $C \subseteq \R^n$ be a convex set. The \emph{relative interior} of $C$ is
+\[
+    \mathrm{ri}(C)=\{x \in C : \exists\,\epsilon > 0\ \text{s.t.}\ \mathrm{aff}(C) \cap B(x,\epsilon)\subseteq C\}.
+\]
+\end{definition}
+
+\begin{theorem}
+\imp{2}Let $f: \R^n \to \R^m$ be affine, i.e.\ $f(x) = Ax + b$, with $A \in \R^{m \times n}$, $b \in \R^m$.
+\begin{itemize}
+    \item If $C \subseteq \R^n$ is convex, then $f(C) = \{f(x) : x \in C\}$ is convex.
+    \item If $C \subseteq \R^m$ is convex, then $f^{-1}(C) = \{x \in \R^n : f(x) \in C\}$ is convex.
+\end{itemize}
+\end{theorem}
+
+\begin{definition}[Cone]
+\imp{1}A set $C \subseteq \R^n$ is a \emph{cone} if, for every $x \in C$ and every $\lambda \ge 0$,
+\[
+    \lambda x \in C.
+\]
+\end{definition}
+
+\begin{definition}[Convex function]
+\imp{3}Let $C \subseteq \R^n$ be convex. A function $f: \R^n \to \R$ is \emph{convex} on $C$ if, for all $x,y \in C$ and every $\alpha \in [0,1]$,
+\[
+    f(\alpha y + (1-\alpha)x) \le \alpha f(y) + (1-\alpha)f(x).
+\]
+When $C = \R^n$ we simply say that $f$ is convex.
+\end{definition}
+
+\begin{theorem}
+\imp{2}A function $f:\R^n \to \R$ is convex if and only if the set
+\[
+    \mathrm{epi}\, f \coloneqq \{(x,y) \in \R^{n} \times \R : y \ge f(x)\},
+\]
+called the \emph{epigraph} of $f$, is convex.
+\end{theorem}
+
+\begin{definition}[Strongly convex function]
+\imp{3}Given a convex set $C \subseteq \R^n$, $f$ is \emph{strongly convex} on $C$ if there exists $\tau > 0$ such that, for all $x, y \in C$ and $\alpha \in [0,1]$,
+\[
+    f(\alpha y + (1-\alpha)x) \le \alpha f(y) + (1-\alpha)f(x) - \frac{\tau}{2}\alpha(1-\alpha)\norm{y-x}_2^2.
+\]
+\end{definition}
+
+\begin{theorem}
+\imp{2}$f$ is strongly convex if and only if there exists $\tau > 0$ such that $f(x) - \frac{\tau}{2}\norm{x}_2^2$ is convex.
+\end{theorem}
+
+\begin{theorem}[First order condition]
+\imp{3}Let $f$ be continuously differentiable on $C$. Then $f$ is convex on $C$ if and only if
+\[
+    f(y) \ge f(x) + (y-x)^T \nabla f(x) \qquad \forall x,y \in C.
+\]
+\end{theorem}
+
+\begin{theorem}
+\imp{3}Let $f$ be continuously differentiable on $C$.
+\begin{itemize}
+    \item $f$ is strictly convex on $C$ if and only if
+    \[
+        f(y) > f(x) + (y-x)^T \nabla f(x) \qquad \forall x,y \in C,\ x \ne y.
+    \]
+    \item $f$ is strongly convex on $C$ if and only if there exists $\tau > 0$ such that
+    \[
+        f(y) \ge f(x) + (y-x)^T \nabla f(x) + \frac{\tau}{2}\norm{y-x}_2^2 \qquad \forall x,y \in C.
+    \]
+\end{itemize}
+\end{theorem}
+
+\begin{theorem}[Second order conditions]
+\imp{3}Let $f$ be twice continuously differentiable on $C$.
+\begin{itemize}
+    \item $f$ is convex on $C$ if and only if $\nabla^2 f(x)$ is positive semidefinite for all $x \in C$, i.e.
+    \[
+        v^T \nabla^2 f(x) v \ge 0 \quad \forall v \in \R^n,\ \forall x \in C,
+    \]
+    or, equivalently, the eigenvalues of $\nabla^2 f(x)$ are non-negative for all $x \in C$.
+    \item If $\nabla^2 f(x)$ is positive definite for all $x \in C$, then $f$ is strictly convex on $C$.
+    \item $f$ is strongly convex on $C$ if and only if there exists $\tau > 0$ such that $\nabla^2 f(x) - \tau I_n$ is positive semidefinite for all $x \in C$, i.e.
+    \[
+        v^T \nabla^2 f(x) v \ge \tau\norm{v}_2^2 \quad \forall v \in \R^n,\ \forall x \in C,
+    \]
+    or, equivalently, the eigenvalues of $\nabla^2 f(x)$ are greater than or equal to $\tau$ for all $x \in C$.
+\end{itemize}
+\end{theorem}
+
+\begin{theorem}
+\imp{3}\leavevmode
+\begin{itemize}
+    \item If $f$ is convex and $k > 0$, then $kf$ is convex.
+    \item If $f_1$ and $f_2$ are convex, then $f_1 + f_2$ is convex.
+    \item If $f$ is convex, then $f(Ax + b)$ is convex.
+\end{itemize}
+\end{theorem}
+
+\begin{definition}[Optimization problem]
+\imp{2}An optimization problem in \g{standard form} is
+\[
+    f^* = \min \{ f(x) : x \in X \}, \tag{P}
+\]
+where
+\begin{itemize}
+    \item $f: \R^n \to \R$ is the \g{objective function};
+    \item $X \subseteq \R^n$ is the \g{constraints set} or \g{feasible region}.
+\end{itemize}
+If $X \equiv \R^n$, then (P) is said to be \g{unconstrained}.
+\end{definition}
+
+\begin{definition}[Optimal value]
+\imp{2}The \g{optimal value} of (P) is defined by
+\[
+    v(P) = \inf\{f(x) : x \in X\}.
+\]
+\begin{itemize}
+    \item $v(P) \in \R$ if the problem is bounded from below;
+    \item $v(P) = -\infty$ if the problem is unbounded from below;
+    \item $v(P) = +\infty$ if the problem is infeasible, i.e., $X = \emptyset$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Global optimal solution]
+\imp{2}A \g{global optimal solution} of (P) is a point $x^* \in X$ such that
+\[
+    f(x^*) \le f(x) \quad \forall x \in X.
+\]
+The set of global minima of $f$ on $X$ is denoted by $X^* = \argmin\{f(x) : x \in X\}$.
+\end{definition}
+
+\begin{definition}[Local optimal solution]
+\imp{2}A \g{local optimal solution} of (P) is a point $x^* \in X$ such that
+\[
+    f(x^*) \le f(x) \quad \forall x \in X \cap B(x^*, r)
+\]
+for some $r > 0$.
+\end{definition}
+
+\begin{theorem}[Weierstrass]
+\imp{3}If the objective function $f$ is continuous and the feasible region $X$ is closed and bounded, then (at least) a global optimum exists.
+\end{theorem}
+
+\begin{corollary}
+\imp{3}If the objective function $f$ is continuous, the feasible region $X$ is closed and there exists $k \in \R$ such that the $k$-sublevel set
+\[
+    S_k(f) = \{x \in X : f(x) \le k\} \tag{1}
+\]
+is nonempty and bounded, then (at least) a global optimum exists.
+\end{corollary}
+
+\begin{corollary}
+\imp{3}If the objective function $f$ is continuous and \g{coercive}, i.e.,
+\[
+    \lim_{\substack{\norm{x} \to \infty \\ x \in X}} f(x) = +\infty, \tag{2}
+\]
+and the feasible region $X \ne \emptyset$ is closed, then (at least) a global optimum exists.
+\end{corollary}
+
+\begin{theorem}
+    \imp{3}Assume that $f$ is convex on the convex set $X$. Then \g{any local optimum of (P) is a global optimum}.
+\end{theorem}
+
+\begin{theorem}
+    \imp{2}If $f: \R^n \to \R$ is strongly convex on $\R^n$ and $X$ is closed, then there exists a global optimum.
+\end{theorem}
+
+\begin{corollary}
+    \imp{3}If $f$ is strongly convex (on $\R^n$) and $X$ is closed and convex, then there exists a unique global optimum.
+\end{corollary}
+
+\begin{theorem}[Necessary optimality condition]
+    \imp{3}Assume that $X$ is an open set and let $f$ be differentiable at $x^* \in X$. If $x^*$ is a local optimum of (P), then
+    \[
+        \nabla f(x^*)=0.
+    \]
+\end{theorem}
+
+\begin{theorem}[Second order necessary optimality condition]
+    \imp{2}Let $X$ be an open set and let $x^* \in X$ be a local optimum for (P). Then the following conditions hold:
+    \begin{itemize}
+        \item $\nabla f(x^*)=0$;
+        \item the Hessian matrix $\nabla^2 f(x^*)$ is positive semidefinite.
+    \end{itemize}
+\end{theorem}
+
+\begin{theorem}[Second order sufficient optimality condition]
+    \imp{3}Let $X$ be an open set, $x^* \in X$, and assume that the following conditions hold:
+    \begin{itemize}
+        \item $\nabla f(x^*)=0$;
+        \item the Hessian matrix $\nabla^2 f(x^*)$ is positive definite.
+    \end{itemize}
+    Then $x^*$ is a local optimum for (P).
+\end{theorem}
+
+\begin{theorem}[Optimality condition for convex problems]
+    \imp{3}Let $f$ be a differentiable convex function on the open convex set $X$. Then $x^* \in X$ is a global optimum for (P) if and only if $\nabla f(x^*)=0$.
+\end{theorem}
+
+\begin{theorem}
+    \imp{2}Let $f$ be a differentiable strictly convex function on the open convex set $X$. Then $x^* \in X$ is the unique global optimum for (P) if and only if $\nabla f(x^*)=0$.
+\end{theorem}
+
+\begin{corollary}
+    \imp{3}There exists a global optimum $x^*$ for (P) if and only if the following conditions hold:
+    \begin{enumerate}[label=(\roman*)]
+        \item $Qx^*+c=0$;
+        \item $Q$ is positive semidefinite.
+    \end{enumerate}
+\end{corollary}
+
+\begin{algorithm}[H]
+\caption{\imp{3}Gradient method}
+Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    $d^k = -\nabla f(x^k)$ \tcp*{search direction}
+    compute an optimal solution $t_k$ of $\min_{t>0} f(x^k + t d^k)$ \tcp*{step size}
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{theorem}[Error bound]
+    \imp{2}If $f(x) = \frac{1}{2}x^TQx + c^Tx$, with $Q$ a positive definite matrix, and $x^*$ is the global minimum of $f$, then the sequence $\{x^k\}$ satisfies the following inequality:
+    \[
+        \norm{x^{k+1}-x^*}_Q \le \left(\frac{\frac{\lambda_n}{\lambda_1}-1}{\frac{\lambda_n}{\lambda_1}+1}\right)\norm{x^k-x^*}_Q \quad \forall k \ge 0, \qquad \text{(linear convergence)}
+    \]
+    where $\norm{x}_Q = \sqrt{x^TQx}$ and $0 < \lambda_1 \le \lambda_2 \le \dots \le \lambda_n$ are the eigenvalues of $Q$.
+\end{theorem}
+
+\begin{algorithm}[H]
+\caption{\imp{3}Gradient method with the Armijo inexact line search}
+Set $\alpha, \gamma \in (0,1)$ and $\bar{t} > 0$. Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    $d^k = -\nabla f(x^k)$, $t_k = \bar{t}$\;
+    \While{$f(x^k + t_k d^k) > f(x^k) + \alpha\, t_k (d^k)^T \nabla f(x^k)$}{
+        $t_k = \gamma\, t_k$\;
+    }
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{\imp{3}Conjugate gradient method for quadratic functions}
+Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$g^k = \nabla f(x^k) \neq 0$}{
+    \eIf{$k = 0$}{
+        $d^k = -g^k$\;
+    }{
+        $\beta_k = \dfrac{(g^k)^TQd^{k-1}}{(d^{k-1})^TQd^{k-1}}$, $d^k = -g^k + \beta_k d^{k-1}$\;
+    }
+    $t_k = -\dfrac{(g^k)^Td^k}{(d^k)^TQd^k}$\;
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{theorem}[Convergence]
+    \imp{3}The CG method finds the global minimum in at most $n$ iterations.
+    If $Q$ has $r$ distinct eigenvalues, then the CG method finds the global minimum in at most $r$ iterations.
+\end{theorem}
+
+\begin{theorem}[Error bound]
+    \imp{2}If $0 < \lambda_1 \le \lambda_2 \le \dots \le \lambda_n$ are the eigenvalues of $Q$, then the following bounds hold:
+    \[
+        \norm{x^k - x^*}_Q \le 2\left(\frac{\sqrt{\lambda_n/\lambda_1} - 1}{\sqrt{\lambda_n/\lambda_1} + 1}\right)^k \norm{x^0 - x^*}_Q, \qquad \forall\, k \ge 0,
+    \]
+    \[
+        \norm{x^k - x^*}_Q \le \left(\frac{\lambda_{n-k+1} - \lambda_1}{\lambda_{n-k+1} + \lambda_1}\right) \norm{x^0 - x^*}_Q, \qquad \forall\, k \ge 0.
+    \]
+\end{theorem}
+
+\begin{algorithm}[H]
+\caption{\imp{3}Newton method (basic version)}
+Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    Let $d^k$ be the solution of the linear system $\nabla^2 f(x^k)\, d = -\nabla f(x^k)$\;
+    $x^{k+1} = x^k + d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{theorem}[Convergence]
+    \imp{2}If $x^*$ is a local minimum of $f$ and $\nabla^2 f(x^*)$ is positive definite, then there exists $\delta > 0$ such that for any $x^0 \in B(x^*, \delta)$ the sequence $\{x^k\}$ converges to $x^*$ and
+    \[
+        \norm{x^{k+1} - x^*} \le C\norm{x^k - x^*}^2 \qquad \forall\, k > \bar{k},
+    \]
+    for some $C > 0$ and $\bar{k} > 0$ (\g{quadratic convergence}).
+\end{theorem}
+
+\begin{algorithm}[H]
+\caption{\imp{3}Newton method with (inexact) line search}
+Set $\alpha, \gamma \in (0,1)$ and $\bar{t} > 0$. Choose $x^0 \in \R^n$, set $k = 0$\;
+\While{$\nabla f(x^k) \neq 0$}{
+    Let $d^k$ be the solution of the linear system $\nabla^2 f(x^k)\, d = -\nabla f(x^k)$\;
+    $t_k = \bar{t}$\;
+    \While{$f(x^k + t_k d^k) > f(x^k) + \alpha\, t_k (d^k)^T \nabla f(x^k)$}{
+        $t_k = \gamma\, t_k$\;
+    }
+    $x^{k+1} = x^k + t_k d^k$\;
+    $k = k + 1$\;
+}
+\end{algorithm}
+
+\begin{theorem}[Convergence]
+    \imp{2}If $f$ is strongly convex, then for any starting point $x^0 \in \R^n$ the sequence $\{x^k\}$ converges to the global minimum of $f$. Moreover, if $\alpha \in (0, 1/2)$ and $\bar{t} = 1$, then the convergence is quadratic.
+\end{theorem}
+
+\begin{definition}[Tangent cone]
+    \imp{2}The \g{tangent cone} at $x^* \in X$ is
+    \[
+        T_X(x^*) = \left\{ d \in \R^n : \exists\, \{z_k\} \subset X,\ \exists\, \{t_k\} > 0,\ z_k \to x^*,\ t_k \to 0,\ \lim_{k \to \infty} \frac{z_k - x^*}{t_k} = d \right\}.
+    \]
+\end{definition}
+
+\begin{definition}[Active constraints]
+    \imp{3}The set of \g{active constraints} at $x^* \in X$ is
+    \[
+        A(x^*) = \{i : g_i(x^*) = 0\},
+    \]
+    i.e., the inequality constraints satisfied with equality at $x^*$.
+\end{definition}
+
+\begin{definition}[First-order feasible direction cone]
+    \imp{2}The \g{first-order feasible direction cone} at $x^* \in X$ is
+    \[
+        D(x^*) = \left\{ d \in \R^n :
+        \begin{aligned}
+            & d^T\nabla g_i(x^*) \le 0 && \forall\, i \in A(x^*),\\
+            & d^T\nabla h_j(x^*) = 0 && \forall\, j = 1, \dots, p
+        \end{aligned}
+        \right\}.
+    \]
+\end{definition}
+
+\begin{definition}[Abadie constraint qualification]
+    \imp{3}We say that the \g{Abadie constraint qualification} (ACQ) holds at a point $x^* \in X$ if
+    \[
+        T_X(x^*) = D(x^*).
+    \]
+\end{definition}
+
+\begin{theorem}[Sufficient conditions for ACQ]
+    \imp{3}\leavevmode\begin{enumerate}[label=\alph*)]
+        \item \g{Affine constraints}: if $g_i$ and $h_j$ are affine for all $i = 1, \dots, m$ and $j = 1, \dots, p$, then ACQ holds at any $x \in X$.
+        \item \g{Slater condition} for convex problems: if $g_i$ are convex for all $i = 1, \dots, m$, $h_j$ are affine for all $j = 1, \dots, p$ and there exists $\bar{x} \in X$ s.t.\ $g(\bar{x}) < 0$ and $h(\bar{x}) = 0$, then ACQ holds at any $x \in X$.
+        \item \g{Linear independence} of the gradients of active constraints: if $x^* \in X$ and the vectors
+        \[
+            \nabla g_i(x^*) \text{ for } i \in A(x^*), \qquad \nabla h_j(x^*) \text{ for } j = 1, \dots, p
+        \]
+        are linearly independent, then ACQ holds at $x^*$.
+    \end{enumerate}
+\end{theorem}
+
+\begin{lemma}
+    \imp{1}If $x^*$ is a local minimum of (P), then
+    \[
+        d^T\nabla f(x^*) \ge 0 \qquad \forall\, d \in T_X(x^*).
+    \]
+\end{lemma}
+
+\begin{theorem}[Karush-Kuhn-Tucker]
+    \imp{3}If $x^*$ is a local minimum and ACQ holds at $x^*$, then there exist $\lambda^* \in \R^m$ and $\mu^* \in \R^p$ s.t.\ $(x^*, \lambda^*, \mu^*)$ satisfies the \g{KKT system}:
+    \[
+        \begin{cases}
+            \nabla f(x^*) + \sum_{i=1}^{m} \lambda_i^* \nabla g_i(x^*) + \sum_{j=1}^{p} \mu_j^* \nabla h_j(x^*) = 0,\\
+            \lambda_i^* g_i(x^*) = 0 \quad \forall\, i = 1, \dots, m,\\
+            \lambda^* \ge 0,\\
+            g(x^*) \le 0,\\
+            h(x^*) = 0.
+        \end{cases}
+    \]
+\end{theorem}
+
+\begin{definition}[Lagrangian function]
+    \imp{3}The \g{Lagrangian function} $L : \R^n \times \R^m \times \R^p \to \R$ is
+    \[
+        L(x, \lambda, \mu) \coloneqq f(x) + \sum_{i=1}^{m} \lambda_i g_i(x) + \sum_{j=1}^{p} \mu_j h_j(x).
+    \]
+\end{definition}
+
+\begin{theorem}
+    \imp{3}If the optimization problem is convex and $(x^*, \lambda^*, \mu^*)$ solves the KKT system, then $x^*$ is a global optimum.
+\end{theorem}
+
+\begin{definition}[Lagrangian relaxation]
+    \imp{3}Given $\lambda \ge 0$ and $\mu \in \R^p$, the problem
+    \[
+        \inf L(x, \lambda, \mu), \quad x \in \R^n
+    \]
+    is called \g{Lagrangian relaxation} of (P), and
+    \[
+        \varphi(\lambda, \mu) = \inf_{x \in \R^n} L(x, \lambda, \mu)
+    \]
+    is the \g{Lagrangian dual function}.
+\end{definition}
+
+\begin{theorem}
+    \imp{2}For any $\lambda \ge 0$ and $\mu \in \R^p$, we have $\varphi(\lambda, \mu) \le v(P)$.
+\end{theorem}
+
+\begin{definition}[Lagrangian dual problem]
+    \imp{3}The problem
+    \[
+        \max \varphi(\lambda, \mu), \quad \lambda \ge 0,\ \mu \in \R^p \tag{D}
+    \]
+    is called \g{Lagrangian dual problem} of (P), and (P) is called \g{primal problem}.
+\end{definition}
+
+\begin{definition}[Strong duality]
+    \imp{2}We say that \g{strong duality} holds for (P) if $v(D) = v(P)$ and (D) admits an optimal solution.
+\end{definition}
+
+\begin{theorem}
+    \imp{3}Suppose $f$, $g$, $h$ are continuously differentiable, the primal problem
+    \[
+        \begin{cases}
+            \min\, f(x)\\
+            g(x) \le 0\\
+            h(x) = 0
+        \end{cases} \tag{P}
+    \]
+    is convex, there exists a global optimum $x^*$ and ACQ holds at $x^*$. Then:
+    \begin{itemize}
+        \item strong duality holds ($v(D) = v(P)$ and (D) admits an optimal solution);
+        \item $(\lambda^*, \mu^*)$ is optimal for (D) if and only if $(\lambda^*, \mu^*)$ is a KKT multipliers vector associated with $x^*$.
+    \end{itemize}
+\end{theorem}
+
+\begin{theorem}[Characterization of strong duality]
+    \imp{2}$(x^*, \lambda^*, \mu^*)$ is a \g{saddle point} of $L$, i.e.,
+    \[
+        L(x^*, \lambda, \mu) \le L(x^*, \lambda^*, \mu^*) \le L(x, \lambda^*, \mu^*) \qquad \forall\, x \in \R^n,\ \lambda \in \R^m_+,\ \mu \in \R^p,
+    \]
+    if and only if $x^*$ is optimal for (P), $(\lambda^*, \mu^*)$ is optimal for (D) and $v(P) = v(D)$.
+\end{theorem}
+
+\begin{definition}[Margin of separation]
+    \imp{2}If $H$ is a separating hyperplane, the \g{margin of separation} of $H$ is the minimum distance between $H$ and $A \cup B$, i.e.,
+    \[
+        \rho(H) = \min_{x \in A \cup B} \frac{|w^\top x + b|}{\norm{w}}.
+    \]
+\end{definition}
+
+\begin{theorem}
+    \imp{3}Finding the separating hyperplane with the maximum margin of separation is equivalent to solving the convex quadratic programming problem
+    \begin{equation}
+        \begin{cases}
+            \displaystyle \min_{w, b} \ \frac{1}{2} \norm{w}^2 \\
+            w^\top x^i + b \ge 1 \quad \forall x^i \in A, \\
+            w^\top x^j + b \le -1 \quad \forall x^j \in B.
+        \end{cases}
+    \end{equation}
+\end{theorem}
+
+\begin{definition}[Kernel function]
+    \imp{2}A function $k \colon \R^n \times \R^n \to \R$ is called \g{kernel} if there exists a map $\varphi \colon \R^n \to H$ such that
+    \[
+        k(x, y) = \langle \varphi(x), \varphi(y) \rangle,
+    \]
+    where $\langle \cdot, \cdot \rangle$ is a scalar product in the feature space $H$.
+\end{definition}
+
+\begin{theorem}
+    \imp{2}If $k \colon \R^n \times \R^n \to \R$ is a kernel and $x^1, \dots, x^\ell \in \R^n$, then the matrix $K$ defined by
+    \[
+        K_{ij} = k(x^i, x^j)
+    \]
+    is positive semidefinite.
+\end{theorem}
+
+\end{document}
