@@ -2,6 +2,8 @@
 
 \subsection{Linear SVM with soft margin}
 
+The linear SVM of the previous lesson needs the two sets to be linearly separable, which is rarely true for real data. We first allow some errors (soft margin) and then change the space where the data live.
+
 What if sets $A$ and $B$ are not linearly separable?\\
 The linear system
 \[
@@ -94,6 +96,8 @@ Thus $b^* = \frac{1}{y^i} - (w^*)^\top x^i$.
 
 \subsection{Nonlinear SVM}
 
+The soft margin allows few errors, but if the sets are separated by a nonlinear surface this is not enough.
+
 If two sets $A$ and $B$ are not linearly separable, we ask ourselves: are they linearly separable in another space? To answer this we use a map $\varphi \colon \R^n \to H$, where $H$ is a higher dimensional (maybe infinite) space called \g{feature space}. We try to linearly separate the images $\varphi(x^i)$, $i = 1, \dots, \ell$, in the feature space.
 
 The primal problem is
@@ -147,6 +151,8 @@ Note that $f(x)$ depends on
 
 \subsubsection{Kernel function}
 
+The dual problem and the decision function depend on $\varphi$ only through the scalar products $\varphi(x)^\top\varphi(y)$. Hence we never need to compute $\varphi$ explicitly: it is enough to know a function that returns these scalar products.
+
 \newpage
 \begin{definition}[Kernel function]
     A function $k \colon \R^n \times \R^n \to \R$ is called \g{kernel} if there exists a map $\varphi \colon \R^n \to H$ such that
@@ -164,6 +170,8 @@ Examples of kernels:
     \item $k(x, y) = \tanh(\beta x^\top y + \gamma)$, with suitable $\beta$ and $\gamma$.
 \end{itemize}
 
+Kernels satisfy a property that keeps the dual problem convex.
+
 \begin{theorem}
     If $k \colon \R^n \times \R^n \to \R$ is a kernel and $x^1, \dots, x^\ell \in \R^n$, then the matrix $K$ defined by
     \[
@@ -172,7 +180,7 @@ Examples of kernels:
     is positive semidefinite.
 \end{theorem}
 
-The dual problem depends on the kernel $k$:
+Replacing the scalar products with the kernel, the dual problem depends only on $k$:
 \[
     \begin{cases}
         \displaystyle \max_{\lambda} \ -\frac{1}{2} \sum_{i=1}^{\ell} \sum_{j=1}^{\ell} y^i y^j k(x^i, x^j) \lambda_i \lambda_j + \sum_{i=1}^{\ell} \lambda_i \\
@@ -180,6 +188,8 @@ The dual problem depends on the kernel $k$:
         0 \le \lambda_i \le C \quad i = 1, \dots, \ell.
     \end{cases}
 \]
+
+Summing up, the nonlinear SVM is applied as follows.
 
 The method is:
 \begin{itemize}

@@ -4,6 +4,8 @@ We will now introduce another family of problems: \g{regression problems}. We wi
 
 \subsection{Polynomial regression}
 
+We start from the classical problem of fitting data with a polynomial.
+
 We have $\ell$ experimental data $y_1,\dots,y_\ell \in \R$ corresponding to the observations related to the points $x_1,\dots,x_\ell \in \R$. We want to find the best approximation of the couples $(x_i,y_i)$ with a polynomial $p$ of degree $n-1$, with $n \le \ell$. The polynomial $p$ has coefficients $z_1,\dots,z_n$:
 \[
 p(x) = z_1 + z_2 x + z_3 x^2 + \dots + z_n x^{n-1}.
@@ -164,6 +166,8 @@ d = \begin{pmatrix} \varepsilon e_\ell - y\\ \varepsilon e_\ell + y \end{pmatrix
 
 \subsubsection{Slack variables}
 
+The SVM-like formulation is not always feasible, exactly as in the hard margin SVM.
+
 If $\varepsilon$ is too small, problem \eqref{eq:svr} may be infeasible: no affine function has all the data inside the tube. As for the soft margin SVM, we relax the constraints with the slack variables $\xi^+,\xi^- \in \R^\ell$ and penalize them in the objective function:
 \begin{equation}\label{eq:svr-slack}
 \begin{cases}
@@ -220,6 +224,8 @@ Substituting in $L$ and eliminating $\eta^+,\eta^-$ (since $\eta_i^\pm = C - \la
 
 \subsubsection{Dual problem in matrix form}
 
+To solve the dual with a standard quadratic programming solver it is convenient to write it in matrix form.
+
 Let $\mathcal{X} = [(x^i)^Tx^j]_{i,j=1,\dots,\ell} = XX^T$ and
 \[
 \mathcal{Q} = \begin{pmatrix} \mathcal{X} & -\mathcal{X}\\ -\mathcal{X} & \mathcal{X} \end{pmatrix}.
@@ -240,6 +246,8 @@ we see that it is equal to $((\lambda^+)^T,(\lambda^-)^T)\,\mathcal{Q}\,\binom{\
 Since $\mathcal{X} = XX^T$ is positive semidefinite, so is $\mathcal{Q}$, and the dual is a convex quadratic programming problem with simple constraints.
 
 \subsubsection{Recovering the primal solution}
+
+Solving the dual gives only the multipliers, so we need to recover $w$ and $b$ from them.
 
 If $(\lambda^+,\lambda^-)$ is a dual optimal solution, then $x^i$ is a \g{support vector} if $\lambda_i^+>0$ or $\lambda_i^->0$. The optimal $w$ is a combination of the support vectors only:
 \[

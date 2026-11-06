@@ -1,6 +1,8 @@
 \section{Lesson 07 --- 15/10/2026}
 
 \subsection{Conjugate gradient method}
+The gradient method suffers from the zig-zag behavior and can be very slow when the condition number is large. The conjugate gradient method was introduced to overcome this problem.
+
 The \g{conjugate gradient method} (CG) is a descent method where the search direction involves the gradient computed at the current iteration and the direction computed at the previous iteration.
 
 We first consider the quadratic case:
@@ -83,6 +85,8 @@ At iteration $n$, notice that the error goes to $0$, since $k = n$ and $\lambda_
 
 \subsection{Newton method}
 
+The methods seen so far use only the gradient. The Newton method also uses second order information, aiming at a faster convergence.
+
 \subsubsection{Basic version}
 
 We want to find a stationary point of a function $f$, i.e., a point where $\nabla f = 0$. To study the gradient, at each iteration $k$ we consider its linear expansion at $x^k$:
@@ -159,6 +163,9 @@ Drawbacks of the Newton method:
 \end{example}
 
 \subsection{Newton method with line search}
+
+To overcome the local convergence of the basic version, we combine the Newton direction with a line search.
+
 If $f$ is strongly convex, then we have global convergence because $d^k$ is a descent direction, in fact:
 \[
     \nabla f(x^k)^T d^k = -\nabla f(x^k)^T\left[\nabla^2 f(x^k)\right]^{-1}\nabla f(x^k) < 0.

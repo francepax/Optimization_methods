@@ -2,6 +2,8 @@
 
 \subsection{Gradient method --- quadratic case}
 
+In the quadratic case the exact line search can be solved in closed form, so we can analyze the behavior of the gradient method in detail.
+
 If $f(x) = \frac{1}{2}x^TQx + c^Tx$, with $Q$ a positive definite matrix, we can use the Taylor expansion at $x^k$:
 \[
     f(x^k+td^k) = f(x^k) + (td^k)^T\nabla f(x^k) + \frac{1}{2}(td^k)^TQ\,td^k
@@ -34,6 +36,7 @@ As already observed, two subsequent directions are orthogonal: $(d^k)^Td^{k+1} =
 The convergence rate is strictly related to the condition number of the matrix $Q$.
 
 \subsection{Inexact version of gradient methods}
+
 When $f$ is not a quadratic function, finding the exact minimum along the direction may be computationally expensive, so in these cases we define a stopping condition on the step.
 
 \begin{algorithm}[htbp]

@@ -3,6 +3,8 @@
 
 \subsection{Cones}
 
+We introduce a class of sets that is closed under scaling. Cones will be used to describe the feasible directions at a point, and therefore to state optimality conditions.
+
 \begin{definition}[Cone]
 A set $C \subseteq \R^n$ is a \emph{cone} if, for every $x \in C$ and every $\lambda \ge 0$,
 \[
@@ -106,6 +108,8 @@ Geometrically, the graph of $f$ between $x$ and $y$ lies below the chord joining
     \label{fig:convex_def}
 \end{figure}
 
+The following theorem links convex functions and convex sets, so that the properties of the latter can be used for the former.
+
 \begin{theorem}
 A function $f:\R^n \to \R$ is convex if and only if the set
 \[
@@ -120,11 +124,15 @@ Given a convex set $C \subseteq \R^n$, a function $f:\R^n \to \R$ is \emph{conca
 
 Some functions are both convex and concave, like affine functions $f(x) = c^Tx + b$. Every norm $f(x) = \norm{x}$ is convex.
 
+Convex functions are also regular from the topological point of view.
+
 \begin{theorem}[Continuity of convex functions]
 Let $f:\R^n \to \R$ be convex on the convex set $C \subseteq \R^n$. Then $f$ is continuous on $\mathrm{ri}(C)$.
 \end{theorem}
 
 \subsection{Strictly and strongly convex functions}
+
+The definition of convexity can be strengthened in two ways, which will give uniqueness and existence of the optimal solution.
 
 \begin{definition}[Strictly convex function]
 Given a convex set $C \subseteq \R^n$, $f$ is \emph{strictly convex} on $C$ if

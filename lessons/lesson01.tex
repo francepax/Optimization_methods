@@ -52,6 +52,8 @@ The course program covers: convex analysis, existence of optima, optimality cond
 
 \subsection{Convex sets}
 
+Convexity is the key assumption that makes optimization problems tractable, so we start by studying convex sets.
+
 \pagebreak
 \begin{definition}[Convex set]
 A set $C \subseteq \R^n$ is \emph{convex} if, for every $x, y \in C$ and every $\alpha \in [0,1]$,
@@ -61,6 +63,8 @@ A set $C \subseteq \R^n$ is \emph{convex} if, for every $x, y \in C$ and every $
 \end{definition}
 
 In words, the segment joining any two points of $C$ is contained in $C$.
+
+Convexity can be strengthened by allowing all real coefficients, not only those in $[0,1]$: this gives affine sets.
 
 \begin{definition}[Affine set]
 A set $C \subseteq \R^n$ is \emph{affine} if, for every $x, y \in C$ and every $\alpha \in \R$,
@@ -76,6 +80,8 @@ Every affine set is convex, since $[0,1] \subset \R$.
 Examples of affine sets are: any single point $\{x\}$, any line, any subspace, the solution set of a linear system $C = \{x \in \R^n : Ax = b\}$, with $A$ an $m \times n$ matrix and $b \in \R^m$.
 
 A \emph{subspace} is a particular affine set: $S \subseteq \R^n$ is a subspace if $\alpha x + \beta y \in S$ for every $x, y \in S$ and $\alpha, \beta \in \R$. Examples are $\{0\}$, any line through zero, the solution set of a homogeneous system $\{x : Ax = 0\}$.
+
+To describe convexity with more than two points we introduce convex combinations.
 
 \begin{definition}[Convex combination]
 A \emph{convex combination} of the points $x^1,x^2,\dots,x^k$ is a point
@@ -141,6 +147,8 @@ $C$ is convex if and only if $C = \mathrm{conv}(C)$.
 \end{remark}
 
 \subsubsection{Examples of convex sets}
+
+We now present some classes of convex sets that will appear often in the course.
 
 \begin{definition}[Polyhedron]
 A \emph{polyhedron} $P$ is the intersection of a finite number of closed halfspaces in $\R^n$. A closed halfspace is the set of solutions of a linear inequality $a^Tx \le \beta$, with $a \in \R^n$, $\beta \in \R$. Hence

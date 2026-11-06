@@ -45,6 +45,8 @@ Let $x,y \in B(0,1)$; we have to prove that $\alpha x + (1-\alpha)y \in B(0,1)$ 
 
 \subsection{Operations that preserve convexity}
 
+Checking the definition of convexity every time is impractical. It is more convenient to know which operations preserve convexity, so that new convex sets can be built from known ones.
+
 \subsubsection{Algebraic operations}
 
 \begin{lemma}
@@ -54,6 +56,8 @@ Consequently, $C_1 - C_2\coloneqq \{x-y: x \in C_1, y \in C_2\}$ is convex.
 \end{lemma}
 
 \subsubsection{Topological operations}
+
+Convexity is also preserved by taking the closure and the interior.
 
 \begin{lemma}
 If $C$ is convex then $\mathrm{cl}(C)$ is convex.
@@ -100,6 +104,8 @@ Let $A \coloneqq \{x \in \R^2 : 1 \le x_1 \le 2,\ x_2 = 0\}$ and $B \coloneqq \{
 \end{example}
 
 \subsubsection{Affine transformations}
+
+Finally, convexity is preserved by affine maps, both through images and through preimages.
 
 \begin{theorem}
 Let $f: \R^n \to \R^m$ be affine, i.e.\ $f(x) = Ax + b$, with $A \in \R^{m \times n}$, $b \in \R^m$.

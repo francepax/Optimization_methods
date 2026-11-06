@@ -1,5 +1,7 @@
 \section{Lesson 05 --- 08/10/2026}
 
+We now see why convexity is so important in optimization: for convex problems a local optimum is automatically global, and strict or strong convexity give uniqueness and existence.
+
 \begin{theorem}
     Assume that $f$ is convex on the convex set $X$. Then \g{any local optimum of (P) is a global optimum}.
 \end{theorem}
@@ -15,9 +17,13 @@ By contradiction, assume that $x^*$ is not a global optimum. Then there exists $
 which is impossible.
 \end{proof}
 
+If the objective function is strictly convex we also get uniqueness.
+
 \begin{proposition}
     Assume that $f$ is \g{strictly convex} on the convex set $X$ and that (P) admits a global optimum $x^*$. Then $x^*$ is the \g{unique} optimal solution of (P).
 \end{proposition}
+
+Strong convexity guarantees also the existence of a global optimum.
 
 \begin{theorem}
     If $f: \R^n \to \R$ is strongly convex on $\R^n$ and $X$ is closed, then there exists a global optimum.
@@ -49,6 +55,8 @@ We now focus on optimality conditions for unconstrained problems.
 
 From now on, assume that $f$ has continuous first and second order partial derivatives for every $x \in X$.
 
+The gradient condition is not enough to discriminate between minima, maxima and saddle points: second order information helps.
+
 \begin{theorem}[Second order necessary optimality condition]
     Let $X$ be an open set and let $x^* \in X$ be a local optimum for (P). Then the following conditions hold:
     \begin{itemize}
@@ -56,6 +64,8 @@ From now on, assume that $f$ has continuous first and second order partial deriv
         \item the Hessian matrix $\nabla^2 f(x^*)$ is positive semidefinite.
     \end{itemize}
 \end{theorem}
+
+Strengthening the condition on the Hessian we obtain a sufficient condition.
 
 \begin{theorem}[Second order sufficient optimality condition]
     Let $X$ be an open set, $x^* \in X$, and assume that the following conditions hold:
@@ -65,6 +75,8 @@ From now on, assume that $f$ has continuous first and second order partial deriv
     \end{itemize}
     Then $x^*$ is a local optimum for (P).
 \end{theorem}
+
+In the convex case the necessary condition on the gradient becomes also sufficient, and the optimum is global.
 
 \begin{theorem}[Optimality condition for convex problems]
     Let $f$ be a differentiable convex function on the open convex set $X$. Then $x^* \in X$ is a global optimum for (P) if and only if $\nabla f(x^*)=0$.
@@ -81,6 +93,8 @@ The necessity follows from the necessary optimality condition. It's important to
 \end{theorem}
 
 \subsubsection{Existence of global optima for unconstrained quadratic programming problems}
+
+The optimality conditions can be made explicit for quadratic functions, which are the simplest nonlinear functions and will be our main example.
 
 Consider the problem
 \[
@@ -106,6 +120,8 @@ Condition (ii) is the second order condition ($Q$ is the Hessian of $f$).
 If $Q$ is positive semidefinite but not positive definite, in order to guarantee the existence of a global optimum we need to analyze the existence of solutions of the system $Qx+c=0$ using the Rouch\'e--Capelli theorem.
 
 \subsection{Unconstrained optimization methods}
+
+Optimality conditions characterize the solutions, but they do not tell us how to compute them. We now turn to algorithms.
 
 We will see some methods for optimization problems. What is an optimization methods? In an optimization descent methods we want to find a sequence of point $x^0,x^1, \dots, x^k, \dots$ such that $f(x^0)>f(x^1)>\dots f(x^k)>\dots$ and we would like that $\lim_{k \to \infty}x^k = x^*$ where $x^*$ is such that $\nabla f(x^*)=0$ so it's a stationary points.
 
