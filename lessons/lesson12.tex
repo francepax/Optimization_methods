@@ -1,0 +1,264 @@
+\section{Lesson 12 --- 05/11/2026}
+
+We will now introduce another family of problems: \g{regression problems}. We will follow the same method as before: we associate an optimization problem to the regression problem and then solve the dual.
+
+\subsection{Polynomial regression}
+
+We have $\ell$ experimental data $y_1,\dots,y_\ell \in \R$ corresponding to the observations related to the points $x_1,\dots,x_\ell \in \R$. We want to find the best approximation of the couples $(x_i,y_i)$ with a polynomial $p$ of degree $n-1$, with $n \le \ell$. The polynomial $p$ has coefficients $z_1,\dots,z_n$:
+\[
+p(x) = z_1 + z_2 x + z_3 x^2 + \dots + z_n x^{n-1}.
+\]
+
+If we remove the constraint $n \le \ell$ we can always find a polynomial that passes through all the points $(x_i,y_i)$, if the points are all distinct. Obviously $\ell$ is usually large, and we need to approximate with the constraint $n \le \ell$. To evaluate the approximation we define the \g{residual} as the vector $r \in \R^\ell$ such that $r_i = p(x_i) - y_i$, with $i=1,\dots,\ell$.
+
+We want to find the coefficients $z := (z_1,\dots,z_n)$ of the polynomial such that $\norm{r}$ is minimum, which is the same as solving the following unconstrained problem:
+\[
+\min_{z \in \R^n} \norm{Az - y},
+\]
+where $A$ is the Vandermonde matrix defined as:
+\[
+A =
+\begin{pmatrix}
+1 & x_1 & x_1^2 & \dots & x_1^{n-1}\\
+1 & x_2 & x_2^2 & \dots & x_2^{n-1}\\
+\vdots & \vdots & \vdots & & \vdots\\
+1 & x_\ell & x_\ell^2 & \dots & x_\ell^{n-1}
+\end{pmatrix}
+\in \R^{\ell \times n},
+\qquad
+y =
+\begin{pmatrix}
+y_1\\ y_2\\ \vdots\\ y_\ell
+\end{pmatrix}.
+\]
+
+The minimization of $\norm{r}$ is defined for any norm, and for any norm the objective function $f(z) = \norm{Az-y}$ is convex. We will see three particular norms: $\norm{\cdot}_2$, $\norm{\cdot}_1$ and $\norm{\cdot}_\infty$.
+
+\subsubsection{Norm 2}
+
+If we use the Euclidean norm (\g{least squares approximation}) it is better to modify slightly the objective function in order to have easier calculations. We add a square and a factor $1/2$ and obtain the unconstrained quadratic problem:
+\[
+\min_{z \in \R^n} \frac{1}{2}\norm{Az-y}_2^2
+= \frac{1}{2}(Az-y)^T(Az-y)
+= \frac{1}{2} z^T A^T A z - z^T A^T y + \frac{1}{2} y^T y.
+\]
+
+It can be proved that $\operatorname{rank}(A) = n$, thus $A^TA$ is positive definite, so the problem is convex. To find the minimum we evaluate the gradient and solve $\nabla f(z) = 0$. This means that the unique optimal solution is the stationary point of the objective function, i.e., the solution of the linear system:
+\[
+A^TAz=A^Ty.
+\]
+
+\subsubsection{Norm 1}
+
+Using the norm 1 the problem can be reduced to a linear programming problem. Denote by $A_i$ the $i$-th row of the matrix $A$:
+\[
+\min_{z \in \R^n} \norm{Az-y}_1 = \min_{z \in \R^n} \sum_{i=1}^{\ell} |A_i z - y_i|,
+\]
+which is equivalent to
+\[
+\begin{cases}
+\displaystyle \min_{z,u} \sum_{i=1}^{\ell} u_i\\[1ex]
+u_i = |A_i z - y_i| = \max\{A_i z - y_i,\ y_i - A_i z\}
+\end{cases}
+\;\to\;
+\begin{cases}
+\displaystyle \min_{z,u} \sum_{i=1}^{\ell} u_i\\[1ex]
+u_i \ge \max\{A_i z - y_i,\ y_i - A_i z\}
+\end{cases}
+\]
+and finally
+\[
+\begin{cases}
+\displaystyle \min_{z,u} \sum_{i=1}^{\ell} u_i\\[1ex]
+u_i \ge A_i z - y_i & \forall\, i=1,\dots,\ell\\
+u_i \ge y_i - A_i z & \forall\, i=1,\dots,\ell.
+\end{cases}
+\]
+
+In matrix form this can be written as
+\[
+\begin{cases}
+\displaystyle \min_{z,u} e_\ell^T u\\
+Az - u \le y\\
+-Az - u \le -y,
+\end{cases}
+\]
+where $e_\ell^T = (1,\dots,1) \in \R^\ell$. Set
+\[
+D = \begin{pmatrix} A & -I_\ell\\ -A & -I_\ell \end{pmatrix},
+\qquad
+d = \begin{pmatrix} y\\ -y \end{pmatrix},
+\]
+where $I_\ell$ is the identity matrix of order $\ell$. Then we obtain
+\[
+\begin{cases}
+\displaystyle \min_{z,u} (0_n^T, e_\ell^T)\begin{pmatrix} z\\ u \end{pmatrix}\\[1ex]
+D \begin{pmatrix} z\\ u \end{pmatrix} \le d.
+\end{cases}
+\]
+
+\subsubsection{Norm infinity}
+
+If we use the infinity norm we also obtain a linear programming problem:
+\[
+\min_{z \in \R^n} \norm{Az-y}_\infty = \min_{z \in \R^n} \max_{i=1,\dots,\ell} |A_i z - y_i|,
+\]
+which is equivalent to
+\[
+\begin{cases}
+\displaystyle \min_{z,u} u\\[1ex]
+u = \displaystyle\max_{i=1,\dots,\ell} |A_i z - y_i|
+\end{cases}
+\;\to\;
+\begin{cases}
+\displaystyle \min_{z,u} u\\[1ex]
+u \ge A_i z - y_i & \forall\, i=1,\dots,\ell\\
+u \ge y_i - A_i z & \forall\, i=1,\dots,\ell.
+\end{cases}
+\]
+
+Set
+\[
+D = \begin{pmatrix} A & -e_\ell\\ -A & -e_\ell \end{pmatrix},
+\qquad
+d = \begin{pmatrix} y\\ -y \end{pmatrix},
+\]
+where $e_\ell = (1,\dots,1) \in \R^\ell$. In matrix form the problem becomes:
+\[
+\begin{cases}
+\displaystyle \min_{z,u} (0,0,\dots,0,1)\begin{pmatrix} z\\ u \end{pmatrix}\\[1ex]
+D \begin{pmatrix} z\\ u \end{pmatrix} \le d.
+\end{cases}
+\]
+
+\subsection{$\varepsilon$-SV regression}
+
+Least squares and its variants minimize the residual, so every deviation from the data is penalized. We now follow a different idea, closer to SVMs. Given the training data $\{(x^1,y_1),\dots,(x^\ell,y_\ell)\}$, with $x^i \in \R^n$, $y_i \in \R$, and a tolerance $\varepsilon > 0$, in \g{$\varepsilon$-SV regression} we look for a function $f$ such that
+\[
+|f(x^i) - y_i| \le \varepsilon, \qquad i=1,\dots,\ell,
+\]
+and that satisfies some additional property, for example being as flat as possible. Geometrically, the graph of $f$ is surrounded by a tube of half-width $\varepsilon$ (the \g{$\varepsilon$-tube}) that must contain all the data.
+
+\subsubsection{Linear $\varepsilon$-SV regression}
+
+In the linear case we consider an affine function $f(x) = w^Tx + b$. As in the SVM, flatness of $f$ means that $w$ must be small, so we minimize $\norm{w}^2$. We obtain the convex quadratic problem
+\begin{equation}\label{eq:svr}
+\begin{cases}
+\displaystyle \min_{w,b} \frac{1}{2}\norm{w}^2\\[1ex]
+y_i \le w^Tx^i + b + \varepsilon & \forall\, i=1,\dots,\ell\\
+y_i \ge w^Tx^i + b - \varepsilon & \forall\, i=1,\dots,\ell.
+\end{cases}
+\end{equation}
+
+Let $X \in \R^{\ell\times n}$ be the matrix whose $i$-th row is $(x^i)^T$. In matrix form the problem is
+\[
+\begin{cases}
+\displaystyle \min_{w,b} \frac{1}{2}(w^T, b)\,Q\begin{pmatrix} w\\ b \end{pmatrix}\\[1ex]
+D\begin{pmatrix} w\\ b \end{pmatrix} \le d,
+\end{cases}
+\qquad
+Q = \begin{pmatrix} I_n & 0_n\\ 0_n^T & 0 \end{pmatrix},\quad
+D = \begin{pmatrix} -X & -e_\ell\\ X & e_\ell \end{pmatrix},\quad
+d = \begin{pmatrix} \varepsilon e_\ell - y\\ \varepsilon e_\ell + y \end{pmatrix}.
+\]
+
+\subsubsection{Slack variables}
+
+If $\varepsilon$ is too small, problem \eqref{eq:svr} may be infeasible: no affine function has all the data inside the tube. As for the soft margin SVM, we relax the constraints with the slack variables $\xi^+,\xi^- \in \R^\ell$ and penalize them in the objective function:
+\begin{equation}\label{eq:svr-slack}
+\begin{cases}
+\displaystyle \min_{w,b,\xi^+,\xi^-} \frac{1}{2}\norm{w}^2 + C\sum_{i=1}^{\ell}(\xi_i^+ + \xi_i^-)\\[1ex]
+y_i \le w^Tx^i + b + \varepsilon + \xi_i^+ & \forall\, i=1,\dots,\ell\\
+y_i \ge w^Tx^i + b - \varepsilon - \xi_i^- & \forall\, i=1,\dots,\ell\\
+\xi^+ \ge 0,\ \xi^- \ge 0.
+\end{cases}
+\end{equation}
+The parameter $C>0$ gives the trade-off between the flatness of $f$ and the tolerance to deviations larger than $\varepsilon$. The problem is always feasible and is still a convex quadratic problem. In matrix form
+\[
+\begin{cases}
+\displaystyle \min \frac{1}{2}(w^T, b, (\xi^+)^T, (\xi^-)^T)\,Q_1 \begin{pmatrix} w\\ b\\ \xi^+\\ \xi^- \end{pmatrix} + c^T\begin{pmatrix} w\\ b\\ \xi^+\\ \xi^- \end{pmatrix}\\[1ex]
+D_1\begin{pmatrix} w\\ b\\ \xi^+\\ \xi^- \end{pmatrix} \le d_1\\
+\xi^+\ge 0,\ \xi^-\ge 0,
+\end{cases}
+\]
+where
+\[
+Q_1 = \begin{pmatrix} I_n & 0_n & O_{n\times 2\ell}\\ 0_n^T & 0 & 0_{2\ell}^T\\ O_{2\ell\times n} & 0_{2\ell} & O_{2\ell\times 2\ell} \end{pmatrix},\quad
+c^T = (0_n^T, 0, C e_\ell^T, C e_\ell^T),
+\]
+\[
+D_1 = \begin{pmatrix} -X & -e_\ell & -I_\ell & O_{\ell\times\ell}\\ X & e_\ell & O_{\ell\times\ell} & -I_\ell \end{pmatrix},\quad
+d_1 = \begin{pmatrix} \varepsilon e_\ell - y\\ \varepsilon e_\ell + y \end{pmatrix}.
+\]
+
+\subsubsection{Dual problem}
+
+As we did for the SVM, we compute the dual of \eqref{eq:svr-slack}, which will depend on the data only through the scalar products $(x^i)^Tx^j$. Let $\lambda^+,\lambda^-\ge 0$ be the multipliers of the first two groups of constraints and $\eta^+,\eta^-\ge 0$ the multipliers of $\xi^+\ge 0$ and $\xi^-\ge0$. The Lagrangian function is
+\begin{align*}
+L(w,b,\xi^+,\xi^-,\lambda^+,\lambda^-,\eta^+,\eta^-) ={}& \frac{1}{2}\norm{w}^2 - w^T\sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)x^i - b\sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)\\
+&+ \sum_{i=1}^{\ell}\xi_i^+(C - \lambda_i^+ - \eta_i^+) + \sum_{i=1}^{\ell}\xi_i^-(C - \lambda_i^- - \eta_i^-)\\
+&- \varepsilon\sum_{i=1}^{\ell}(\lambda_i^+ + \lambda_i^-) + \sum_{i=1}^{\ell}y_i(\lambda_i^+ - \lambda_i^-).
+\end{align*}
+The Lagrangian is linear in $b$, $\xi^+$ and $\xi^-$, so $\inf L = -\infty$ unless
+\[
+\sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-) = 0,\qquad C - \lambda_i^+ - \eta_i^+ = 0,\qquad C - \lambda_i^- - \eta_i^- = 0 \quad \forall\, i.
+\]
+Under these conditions, $L$ is a convex quadratic function of $w$ and the minimum is obtained by solving $\nabla_w L = 0$:
+\[
+w - \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)x^i = 0
+\quad\Longrightarrow\quad
+w = \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)x^i.
+\]
+Substituting in $L$ and eliminating $\eta^+,\eta^-$ (since $\eta_i^\pm = C - \lambda_i^\pm \ge 0$ is equivalent to $\lambda_i^\pm \le C$) we obtain the dual problem
+\[
+\begin{cases}
+\displaystyle \max_{\lambda^+,\lambda^-} -\frac{1}{2}\sum_{i=1}^{\ell}\sum_{j=1}^{\ell}(\lambda_i^+ - \lambda_i^-)(\lambda_j^+ - \lambda_j^-)(x^i)^Tx^j - \varepsilon\sum_{i=1}^{\ell}(\lambda_i^+ + \lambda_i^-) + \sum_{i=1}^{\ell}y_i(\lambda_i^+ - \lambda_i^-)\\[1ex]
+\displaystyle \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-) = 0\\[1ex]
+\lambda_i^+ \in [0,C],\ \lambda_i^- \in [0,C] \quad i=1,\dots,\ell.
+\end{cases}
+\]
+
+\subsubsection{Dual problem in matrix form}
+
+Let $\mathcal{X} = [(x^i)^Tx^j]_{i,j=1,\dots,\ell} = XX^T$ and
+\[
+\mathcal{Q} = \begin{pmatrix} \mathcal{X} & -\mathcal{X}\\ -\mathcal{X} & \mathcal{X} \end{pmatrix}.
+\]
+Expanding the product
+\[
+\sum_{i,j}(\lambda_i^+ - \lambda_i^-)(\lambda_j^+ - \lambda_j^-)(x^i)^Tx^j
+= \sum_{i,j}\bigl(\lambda_i^+\lambda_j^+ - \lambda_i^+\lambda_j^- - \lambda_i^-\lambda_j^+ + \lambda_i^-\lambda_j^-\bigr)(x^i)^Tx^j
+\]
+we see that it is equal to $((\lambda^+)^T,(\lambda^-)^T)\,\mathcal{Q}\,\binom{\lambda^+}{\lambda^-}$. The dual problem becomes
+\[
+\begin{cases}
+\displaystyle \max_{\lambda^+,\lambda^-} -\frac{1}{2}((\lambda^+)^T,(\lambda^-)^T)\,\mathcal{Q}\begin{pmatrix} \lambda^+\\ \lambda^- \end{pmatrix} + \bigl[-\varepsilon(e_\ell^T,e_\ell^T) + (y^T,-y^T)\bigr]\begin{pmatrix} \lambda^+\\ \lambda^- \end{pmatrix}\\[1ex]
+(e_\ell^T,-e_\ell^T)\begin{pmatrix} \lambda^+\\ \lambda^- \end{pmatrix} = 0\\[1ex]
+\lambda_i^+ \in [0,C],\ \lambda_i^- \in [0,C] \quad i=1,\dots,\ell.
+\end{cases}
+\]
+Since $\mathcal{X} = XX^T$ is positive semidefinite, so is $\mathcal{Q}$, and the dual is a convex quadratic programming problem with simple constraints.
+
+\subsubsection{Recovering the primal solution}
+
+If $(\lambda^+,\lambda^-)$ is a dual optimal solution, then $x^i$ is a \g{support vector} if $\lambda_i^+>0$ or $\lambda_i^->0$. The optimal $w$ is a combination of the support vectors only:
+\[
+w = \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)x^i.
+\]
+The value of $b$ is obtained from the complementarity conditions:
+\[
+\begin{aligned}
+&\lambda_i^+\bigl(\varepsilon + \xi_i^+ - y_i + w^Tx^i + b\bigr) = 0,\\
+&\lambda_i^-\bigl(\varepsilon + \xi_i^- + y_i - w^Tx^i - b\bigr) = 0,\\
+&\xi_i^+(C - \lambda_i^+) = 0,\\
+&\xi_i^-(C - \lambda_i^-) = 0.
+\end{aligned}
+\]
+If $0<\lambda_i^+<C$ for some $i$, then $\xi_i^+=0$ and the first condition gives
+\[
+b = y_i - w^Tx^i - \varepsilon,
+\]
+while if $0<\lambda_i^-<C$ for some $i$, then $\xi_i^-=0$ and
+\[
+b = y_i - w^Tx^i + \varepsilon.
+\]
