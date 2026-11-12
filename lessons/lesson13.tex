@@ -1,0 +1,70 @@
+\section{Lesson 13 --- 06/11/2026}
+
+\subsection{Nonlinear \texorpdfstring{$\varepsilon$}{epsilon}-SV regression}
+
+The linear $\varepsilon$-SV regression of the previous lesson can only produce affine functions. As we did for the SVM, we overcome this limit with the kernel functions: a nonlinear regression function is obtained by working in a feature space.
+
+As for classification, a nonlinear regression function can be obtained with the kernel functions. Consider a map $\varphi \colon \R^n \to H$ (associated to a kernel function), where $H$ is a higher dimensional (maybe infinite) feature space, and find a linear regression for the points $\{(\varphi(x^i), y_i)\}$ in the space $H \times \R$.
+
+The primal problem becomes
+\[
+\begin{cases}
+\displaystyle \min \frac{1}{2}\norm{w}^2 + C\sum_{i=1}^{\ell}(\xi_i^+ + \xi_i^-)\\[1ex]
+y_i \le w^T\varphi(x^i) + b + \varepsilon + \xi_i^+ & \forall\, i=1,\dots,\ell\\
+y_i \ge w^T\varphi(x^i) + b - \varepsilon - \xi_i^- & \forall\, i=1,\dots,\ell\\
+\xi^+ \ge 0,\ \xi^- \ge 0,
+\end{cases}
+\]
+where $w$ is a vector in a high (possibly infinite) dimensional space.
+
+Since the primal can have infinitely many variables, we pass to the dual, which is obtained as in the linear case replacing $x^i$ with $\varphi(x^i)$. As for the SVM, the dual depends on $\varphi$ only through scalar products:
+\[
+\begin{cases}
+\displaystyle \max_{\lambda^+,\lambda^-} -\frac{1}{2}\sum_{i=1}^{\ell}\sum_{j=1}^{\ell}(\lambda_i^+ - \lambda_i^-)(\lambda_j^+ - \lambda_j^-)\varphi(x^i)^T\varphi(x^j) - \varepsilon\sum_{i=1}^{\ell}(\lambda_i^+ + \lambda_i^-) + \sum_{i=1}^{\ell}y_i(\lambda_i^+ - \lambda_i^-)\\[1ex]
+\displaystyle \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-) = 0\\[1ex]
+\lambda_i^+, \lambda_i^- \in [0,C].
+\end{cases}
+\]
+Hence we do not need $\varphi$ explicitly. Using the kernel $k(x,y) = \varphi(x)^T\varphi(y)$, the dual becomes
+\[
+\begin{cases}
+\displaystyle \max_{\lambda^+,\lambda^-} -\frac{1}{2}\sum_{i=1}^{\ell}\sum_{j=1}^{\ell}(\lambda_i^+ - \lambda_i^-)(\lambda_j^+ - \lambda_j^-)k(x^i,x^j) - \varepsilon\sum_{i=1}^{\ell}(\lambda_i^+ + \lambda_i^-) + \sum_{i=1}^{\ell}y_i(\lambda_i^+ - \lambda_i^-)\\[1ex]
+\displaystyle \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-) = 0\\[1ex]
+\lambda_i^+, \lambda_i^- \in [0,C],
+\end{cases}
+\]
+which is a finite dimensional problem with $2\ell$ variables.
+
+\subsubsection{Solution method}
+
+Once the dual is written with the kernel, the method is the same as in the linear case, with the scalar products replaced by $k$.
+
+The method is:
+\begin{itemize}
+    \item choose a kernel function $k(x,y)$;
+    \item solve the dual and find $(\lambda^+,\lambda^-)$;
+    \item recover $w$ and $b$ as in the linear case, replacing $x^i$ with $\varphi(x^i)$. We have
+    \[
+    w = \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)\varphi(x^i),
+    \]
+    and, consequently,
+    \[
+    w^T\varphi(x) = \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)\varphi(x^i)^T\varphi(x) = \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)k(x^i,x);
+    \]
+    \item compute $b$ from the complementarity conditions:
+    \[
+    b = y_i - \varepsilon - \sum_{j=1}^{\ell}(\lambda_j^+ - \lambda_j^-)k(x^i,x^j) \quad \text{for some } i \text{ such that } 0 < \lambda_i^+ < C,
+    \]
+    or
+    \[
+    b = y_i + \varepsilon - \sum_{j=1}^{\ell}(\lambda_j^+ - \lambda_j^-)k(x^i,x^j) \quad \text{for some } i \text{ such that } 0 < \lambda_i^- < C.
+    \]
+\end{itemize}
+Recall that $k(x^i,x^j) = k(x^j,x^i)$. Finally, we can write the regression function, which depends on the data only through the kernel:
+\[
+f(x) = w^T\varphi(x) + b = \sum_{i=1}^{\ell}(\lambda_i^+ - \lambda_i^-)k(x^i,x) + b.
+\]
+
+\begin{remark}
+The regression function is linear in the feature space and nonlinear in the input space.
+\end{remark}
