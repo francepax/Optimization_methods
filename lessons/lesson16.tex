@@ -1,0 +1,144 @@
+\section{Lesson 16 --- 26/11/2026}
+
+\subsection{Exact penalty method}
+The penalty method of the previous lesson finds an optimal solution only in the limit $\varepsilon_k \to 0$, and small values of $\varepsilon$ cause numerical issues. We now see a variant that stops after a finite number of iterations. The difference from the quadratic penalty method is the definition of the penalty function, while the problem and the considerations remain the same. Consider a convex constrained problem
+\[
+\begin{cases}
+\min f(x)\\
+g_i(x) \le 0 & \forall\, i=1,\dots,m.
+\end{cases}
+\tag{P}
+\]
+We define the \g{linear penalty function}
+\[
+\tilde p(x) = \sum_{i=1}^{m} \max\{0, g_i(x)\}
+\]
+and consider the penalized problem
+\begin{equation}\label{eq:exact-Peps}
+\begin{cases}
+\displaystyle \min f(x) + \frac{1}{\varepsilon}\, \tilde p(x) := \tilde p_\varepsilon(x)\\[1ex]
+x \in \R^n,
+\end{cases}
+\tag{$\tilde P_\varepsilon$}
+\end{equation}
+which is unconstrained, convex and nonsmooth. As before,
+\[
+\tilde p_\varepsilon(x)
+\begin{cases}
+= f(x) & \text{if } x \in X,\\
+> f(x) & \text{if } x \notin X.
+\end{cases}
+\]
+
+Using a linear penalty function we lose differentiability. Luckily for us, there are methods to solve convex nondifferentiable problems, but we will not see them.
+
+For such penalized problem we do not need a sequence $\varepsilon_k \to 0$ to approximate an optimal solution of (P), which avoids numerical issues. In fact, there exists a suitable $\varepsilon$ such that the minimum of \eqref{eq:exact-Peps} coincides with the minimum of (P).
+
+\begin{proposition}
+Suppose that there exists an optimal solution $x^*$ of (P) and that $\lambda^*$ is a KKT multipliers vector associated to $x^*$. Then, the sets of optimal solutions of (P) and \eqref{eq:exact-Peps} coincide provided that $\varepsilon \in (0, 1/\norm{\lambda^*}_\infty)$.
+\end{proposition}
+
+Since $\lambda^*$ is not known in advance, we cannot choose such $\varepsilon$ directly. We reduce $\varepsilon$ as in the penalty method, but now the threshold is reached after finitely many steps.
+
+\begin{algorithm}[htbp]
+\caption{Exact penalty method}
+Set $\varepsilon_0 > 0$, $\tau \in (0,1)$, $k = 0$\;
+Find an optimal solution $x^k$ of the penalized problem $(\tilde P_{\varepsilon_k})$\;
+\While{$x^k \notin X$}{
+    $\varepsilon_{k+1} = \tau\, \varepsilon_k$\;
+    $k = k + 1$\;
+    Find an optimal solution $x^k$ of the penalized problem $(\tilde P_{\varepsilon_k})$\;
+}
+\end{algorithm}
+
+\begin{theorem}
+The exact penalty method stops after a finite number of iterations at an optimal solution of (P).
+\end{theorem}
+
+Notice that penalty methods generate a sequence of unfeasible points that approximate an optimal solution of (P).
+
+\subsection{Barrier methods}
+
+Unlike penalty methods, barrier methods generate a sequence of feasible points that converge to an optimal solution of the problem. We need to find a suitable unconstrained problem that approximates our constrained problem on the interior of the feasible set. Consider the problem
+\[
+\begin{cases}
+\min f(x)\\
+g_i(x) \le 0 & \forall\, i=1,\dots,m.
+\end{cases}
+\tag{P}
+\]
+We need to make some assumptions:
+\begin{itemize}
+    \item $f$ and $g_i$ are convex and twice continuously differentiable (on $\operatorname{int}(X) \ne \emptyset$);
+    \item there exists an optimal solution (e.g.\ $f$ is coercive or $X$ is bounded);
+    \item the Slater constraint qualification holds: there exists $\bar x$ such that
+    \[
+    g_i(\bar x) < 0 \qquad \forall\, i=1,\dots,m.
+    \]
+\end{itemize}
+Hence strong duality holds. Special cases are linear programming and convex quadratic programming.
+
+\subsection{Logarithmic barrier}
+
+On the interior $\operatorname{int}(X)$ of the feasible set $X$, we can approximate the given problem (P) with
+\begin{equation}\label{eq:barrier}
+\begin{cases}
+\displaystyle \min \psi_\varepsilon(x) := f(x) - \varepsilon \sum_{i=1}^{m} \log(-g_i(x))\\[1ex]
+x \in \operatorname{int}(X).
+\end{cases}
+\end{equation}
+
+\begin{definition}[Logarithmic barrier function]
+The \g{logarithmic barrier function} is
+\[
+B(x) := -\sum_{i=1}^{m} \log(-g_i(x)).
+\]
+\end{definition}
+Then
+\[
+\psi_\varepsilon(x) = f(x) + \varepsilon B(x).
+\]
+Note that, as $x$ tends to the boundary of $X$, $\psi_\varepsilon(x) \to +\infty$, so the barrier keeps the points inside $X$. As $\varepsilon \to 0$, $\psi_\varepsilon$ tends to $f$.
+
+The function $B$ has the following properties:
+\begin{itemize}
+    \item $\operatorname{dom}(B) = \operatorname{int}(X)$;
+    \item $B$ is convex;
+    \item $B$ is smooth with
+    \[
+    \nabla B(x) = -\sum_{i=1}^{m} \frac{1}{g_i(x)}\, \nabla g_i(x),
+    \]
+    \[
+    \nabla^2 B(x) = \sum_{i=1}^{m} \frac{1}{g_i(x)^2}\, \nabla g_i(x) \nabla g_i(x)^T + \sum_{i=1}^{m} \frac{1}{-g_i(x)}\, \nabla^2 g_i(x).
+    \]
+\end{itemize}
+
+We now want to measure how far the solution of \eqref{eq:barrier} is from an optimal solution of (P). If $x_\varepsilon^*$ is an optimal solution of \eqref{eq:barrier}, then
+\[
+\nabla f(x_\varepsilon^*) + \sum_{i=1}^{m} \frac{\varepsilon}{-g_i(x_\varepsilon^*)}\, \nabla g_i(x_\varepsilon^*) = 0.
+\]
+Define
+\[
+\lambda_\varepsilon^* = \left( \frac{\varepsilon}{-g_1(x_\varepsilon^*)}, \dots, \frac{\varepsilon}{-g_m(x_\varepsilon^*)} \right) > 0.
+\]
+Consider the Lagrangian function associated with the given problem (P), $L(x, \lambda) := f(x) + \sum_{i=1}^{m} \lambda_i g_i(x)$. Then
+\[
+L(x, \lambda_\varepsilon^*) = f(x) + \sum_{i=1}^{m} (\lambda_\varepsilon^*)_i\, g_i(x)
+\]
+is convex and $\nabla_x L(x_\varepsilon^*, \lambda_\varepsilon^*) = 0$. Recall that (P) is a convex problem and strong duality holds, hence
+\[
+v(P) = \max_{\lambda \in \R^m_+} \inf_{x \in \R^n} L(x, \lambda).
+\]
+Consequently,
+\[
+v(P) \ge \min_x L(x, \lambda_\varepsilon^*) = L(x_\varepsilon^*, \lambda_\varepsilon^*).
+\]
+Finally, since $x_\varepsilon^*$ is feasible,
+\[
+f(x_\varepsilon^*) \ge v(P) \ge L(x_\varepsilon^*, \lambda_\varepsilon^*) = f(x_\varepsilon^*) + \sum_{i=1}^{m} (\lambda_\varepsilon^*)_i\, g_i(x_\varepsilon^*) = f(x_\varepsilon^*) - m\varepsilon,
+\]
+where $m\varepsilon$ is the \g{optimality gap}.
+
+\begin{remark}
+As $\varepsilon \to 0$, $f(x_\varepsilon^*) \to v(P)$.
+\end{remark}
