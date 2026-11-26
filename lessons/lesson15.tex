@@ -1,0 +1,151 @@
+\section{Lesson 15 --- 19/11/2026}
+
+\subsection{Constrained optimization problems}
+
+We now move our focus to constrained optimization problems. In particular, we will solve related unconstrained problems and, under suitable assumptions, we will show that their solutions converge to a solution of the given constrained problem.
+
+A constrained problem is defined as follows:
+\begin{equation}\label{eq:constr-P}
+\begin{cases}
+\min f(x)\\
+g_i(x) \le 0 & \forall\, i=1,\dots,m\\
+h_j(x) = 0 & \forall\, j=1,\dots,p.
+\end{cases}
+\tag{P}
+\end{equation}
+Let $X = \{x \in \R^n : g(x) \le 0,\ h(x) = 0\}$ be the feasible set of \eqref{eq:constr-P}.
+
+The methods for solving \eqref{eq:constr-P} can be divided into two classes:
+\begin{itemize}
+    \item \g{Primal methods}: the method is applied directly to the given problem \eqref{eq:constr-P} (e.g., methods of changing the variables, descent direction methods such as the projected gradient method or the Frank-Wolfe method).
+    \item \g{Dual methods}: methods that use the dual of \eqref{eq:constr-P} or related properties (e.g., gradient methods for solving the dual problem, penalty methods).
+\end{itemize}
+
+\subsubsection{Changing variables method}
+
+As an example of a method of changing variables, we consider a problem with linear equality constraints only. We observe that a constrained problem with linear equality constraints
+\[
+\begin{cases}
+\min f(x)\\
+Ax = b,
+\end{cases}
+\]
+where $A$ is a $p \times n$ matrix with $\operatorname{rank}(A) = p$, is equivalent to an unconstrained problem. Indeed, write $A = (A_B, A_N)$ with $\det(A_B) \neq 0$, where $A_B$ is a $p \times p$ matrix. Setting $x = \begin{pmatrix} x_B\\ x_N \end{pmatrix}$, then $Ax = b$ is equivalent to
+\[
+A_B x_B + A_N x_N = b \quad\Longrightarrow\quad x_B = A_B^{-1}(b - A_N x_N),
+\]
+thus, eliminating the variables $x_B$,
+\[
+\begin{cases}
+\min f(x)\\
+Ax = b
+\end{cases}
+\quad\text{is equivalent to}\quad
+\begin{cases}
+\min f\big(A_B^{-1}(b - A_N x_N),\, x_N\big)\\
+x_N \in \R^{n-p}.
+\end{cases}
+\]
+
+\begin{remark}
+If $f$ is convex, then the previous unconstrained problem is an unconstrained convex problem.
+\end{remark}
+
+\begin{example}
+Consider
+\[
+\begin{cases}
+\min x_1^2 + x_2^2 + x_3^2\\
+x_1 + x_3 = 1\\
+x_1 + x_2 - x_3 = 2.
+\end{cases}
+\]
+Since $x_1 = 1 - x_3$ and $x_2 = 2 - x_1 + x_3 = 1 + 2x_3$, the original constrained problem is equivalent to the following unconstrained problem:
+\[
+\begin{cases}
+\min (1 - x_3)^2 + (1 + 2x_3)^2 + x_3^2 = 6x_3^2 + 2x_3 + 2\\
+x_3 \in \R.
+\end{cases}
+\]
+Therefore, the optimal solution is $x_3 = -1/6$, $x_1 = 7/6$, $x_2 = 2/3$.
+\end{example}
+
+\subsubsection{Penalty methods}
+
+The change of variables works only for linear equality constraints. For problems with inequality constraints we follow a different idea: we remove the constraints and add to the objective a term that penalizes the points outside the feasible set. Consider a constrained optimization problem
+\begin{equation}\label{eq:pen-P}
+\begin{cases}
+\min f(x)\\
+g_i(x) \le 0 & \forall\, i=1,\dots,m.
+\end{cases}
+\tag{P}
+\end{equation}
+Let $X = \{x \in \R^n : g(x) \le 0\}$ be the feasible set of \eqref{eq:pen-P}.
+
+\begin{definition}[Quadratic penalty function]
+The \g{quadratic penalty function} is
+\[
+p(x) = \sum_{i=1}^{m} \big(\max\{0, g_i(x)\}\big)^2.
+\]
+For $\varepsilon > 0$, the \g{penalized problem} is the unconstrained problem
+\begin{equation}\label{eq:pen-Peps}
+\begin{cases}
+\displaystyle \min f(x) + \frac{1}{\varepsilon}\, p(x) := p_\varepsilon(x)\\[1ex]
+x \in \R^n.
+\end{cases}
+\tag{$P_\varepsilon$}
+\end{equation}
+\end{definition}
+
+Note that
+\[
+p_\varepsilon(x)
+\begin{cases}
+= f(x) & \text{if } x \in X,\\
+> f(x) & \text{if } x \notin X.
+\end{cases}
+\]
+
+\begin{proposition}\label{prop:penalty}
+\leavevmode
+\begin{enumerate}
+    \item If $f$ and $g_i$ are continuously differentiable, then $p_\varepsilon$ is continuously differentiable and
+    \[
+    \nabla p_\varepsilon(x) = \nabla f(x) + \frac{2}{\varepsilon}\sum_{i=1}^{m} \max\{0, g_i(x)\}\, \nabla g_i(x).
+    \]
+    \item If $f$ and $g_i$ are convex, then $p_\varepsilon$ is convex.
+    \item Any \eqref{eq:pen-Peps} is a relaxation of \eqref{eq:pen-P}, i.e., $v(P_\varepsilon) \le v(P)$ for any $\varepsilon > 0$.
+    \item If $x_\varepsilon^*$ solves \eqref{eq:pen-Peps} and $x_\varepsilon^* \in X$, then $x_\varepsilon^*$ is optimal also for \eqref{eq:pen-P}.
+    \item If $0 < \varepsilon_2 < \varepsilon_1$, then $v(P_{\varepsilon_1}) \le v(P_{\varepsilon_2})$.
+\end{enumerate}
+\end{proposition}
+
+Points 3 and 4 suggest to solve a sequence of penalized problems with smaller and smaller $\varepsilon$, until the solution found is feasible.
+
+\begin{algorithm}[htbp]
+\caption{Penalty method}
+Set $\varepsilon_0 > 0$, $\tau \in (0,1)$, $k = 0$\;
+Find an optimal solution $x^k$ of the penalized problem $(P_{\varepsilon_k})$\;
+\While{$x^k \notin X$}{
+    $\varepsilon_{k+1} = \tau\, \varepsilon_k$\;
+    $k = k + 1$\;
+    Find an optimal solution $x^k$ of the penalized problem $(P_{\varepsilon_k})$\;
+}
+\end{algorithm}
+
+\begin{theorem}[Convergence]
+\leavevmode
+\begin{itemize}
+    \item If $f$ is coercive, then the sequence $\{x^k\}$ is bounded and any of its cluster points is an optimal solution of \eqref{eq:pen-P}.
+    \item If $\{x^k\}$ converges to $x^*$, then $x^*$ is an optimal solution of \eqref{eq:pen-P}.
+    \item If $\{x^k\}$ converges to $x^*$ and the gradients of the active constraints at $x^*$ are linearly independent, then $x^*$ is an optimal solution of \eqref{eq:pen-P} and the sequence of vectors $\{\lambda^k\}$ defined as
+    \[
+    \lambda_i^k := \frac{2}{\varepsilon_k} \max\{0, g_i(x^k)\}, \qquad i=1,\dots,m,
+    \]
+    converges to a vector $\lambda^*$ of KKT multipliers associated to $x^*$.
+\end{itemize}
+\end{theorem}
+
+\begin{remark}
+By point 5 of \cref{prop:penalty}, the sequence of the optimal values $v(P_{\varepsilon_k})$ generated by the penalty method is nondecreasing. Moreover, if $x_{\varepsilon_k}^*$ solves $(P_{\varepsilon_k})$ and $x_{\varepsilon_k}^* \notin X$, $k = 1,2,\dots$, then, for $\varepsilon_{k+1} < \varepsilon_k$, we have $v(P_{\varepsilon_{k+1}}) > v(P_{\varepsilon_k})$, since $p_{\varepsilon_{k+1}}(x) > p_{\varepsilon_k}(x)$ for all $x \notin X$.
+\end{remark}
